@@ -145,7 +145,7 @@ export function ApplicationList({
             aria-label="Search applications by company or role"
             className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-[200px]"
           />
-          <div className="flex gap-1 overflow-x-auto pb-1 sm:pb-0" role="group" aria-label="Filter applications by status">
+          <div className="scrollbar-visible flex gap-1 overflow-x-auto pb-1 sm:pb-0" role="group" aria-label="Filter applications by status">
             {FILTERS.map((f) => (
               <button
                 key={f.value}
@@ -163,10 +163,10 @@ export function ApplicationList({
           </div>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="scrollbar-visible max-h-[65vh] overflow-auto">
         <table className="w-full min-w-[760px] border-collapse text-left">
-          <thead>
-            <tr className="border-b border-border bg-muted/35 text-[11px] uppercase tracking-wide text-muted-foreground">
+          <thead className="sticky top-0 z-10">
+            <tr className="border-b border-border bg-muted/95 text-[11px] uppercase tracking-wide text-muted-foreground backdrop-blur">
               {COLUMNS.map((col) => {
                 const isActive = sortColumn === col.key;
                 const ariaSort = isActive

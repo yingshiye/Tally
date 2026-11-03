@@ -196,7 +196,7 @@ export function AddApplicationModal({ userId }: { userId: string }) {
           Add application
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="flex max-h-[85vh] flex-col overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-base font-medium">
             Add application
@@ -211,6 +211,7 @@ export function AddApplicationModal({ userId }: { userId: string }) {
               value={jdText}
               onChange={(e) => setJdText(e.target.value)}
               rows={3}
+              className="max-h-40 overflow-y-auto"
             />
             <Button
               type="button"
