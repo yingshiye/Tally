@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -51,17 +51,78 @@ const EMPTY_FORM = {
   notes: "",
 };
 
+type ExtractedJob = {
+  company: string;
+  role: string;
+  location: string;
+  deadline: string;
+  sponsorship: "sponsors" | "no_sponsorship" | "not_mentioned";
+  sponsorship_quote: string;
+};
+
+const SPONSORSHIP_LABEL: Record<ExtractedJob["sponsorship"], string> = {
+  sponsors: "Sponsorship: posting indicates sponsorship is offered.",
+  no_sponsorship: "Sponsorship: posting indicates no sponsorship / US work authorization required.",
+  not_mentioned: "Sponsorship: not mentioned in posting.",
+};
+
 export function AddApplicationModal({ userId }: { userId: string }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [jdText, setJdText] = useState("");
+  const [extracting, setExtracting] = useState(false);
+  const [extractError, setExtractError] = useState<string | null>(null);
   const router = useRouter();
   const roleOptions = useFieldOptions("role", userId);
   const locationOptions = useFieldOptions("location", userId);
 
   function set(field: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleExtract() {
+    if (!jdText.trim()) return;
+    setExtractError(null);
+    setExtracting(true);
+
+    try {
+      const res = await withTimeout(
+        fetch("/api/extract-job", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jdText }),
+        }),
+        SUPABASE_TIMEOUT_MS
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setExtractError(data.error ?? "Extraction failed");
+        return;
+      }
+
+      const extracted = data.extracted as ExtractedJob;
+      setForm((prev) => {
+        const sponsorshipLine = SPONSORSHIP_LABEL[extracted.sponsorship];
+        const sponsorshipNote = extracted.sponsorship_quote
+          ? `${sponsorshipLine} ("${extracted.sponsorship_quote}")`
+          : sponsorshipLine;
+        const nextNotes = [prev.notes, sponsorshipNote].filter(Boolean).join("\n");
+
+        return {
+          ...prev,
+          company: extracted.company || prev.company,
+          role: extracted.role || prev.role,
+          location: extracted.location || prev.location,
+          notes: nextNotes,
+        };
+      });
+    } catch (err) {
+      setExtractError(err instanceof Error ? err.message : "Extraction failed");
+    } finally {
+      setExtracting(false);
+    }
   }
 
   function handleOpenChange(nextOpen: boolean) {
@@ -117,6 +178,8 @@ export function AddApplicationModal({ userId }: { userId: string }) {
 
       setOpen(false);
       setForm(EMPTY_FORM);
+      setJdText("");
+      setExtractError(null);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -140,6 +203,33 @@ export function AddApplicationModal({ userId }: { userId: string }) {
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-2">
+          <div className="flex flex-col gap-1.5 rounded-md border border-dashed p-3">
+            <Label htmlFor="jd_text">Paste job description (optional)</Label>
+            <Textarea
+              id="jd_text"
+              placeholder="Paste the full job posting text here…"
+              value={jdText}
+              onChange={(e) => setJdText(e.target.value)}
+              rows={3}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5 self-start"
+              disabled={!jdText.trim() || extracting}
+              onClick={handleExtract}
+            >
+              <Sparkles className="h-4 w-4" />
+              {extracting ? "Extracting…" : "Autofill from description"}
+            </Button>
+            {extractError && (
+              <p className="text-sm text-red-600 dark:text-red-400">{extractError}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Fills in company, role, and location below — review before saving.
+            </p>
+          </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="company">Company</Label>
             <Input
