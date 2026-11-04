@@ -83,20 +83,29 @@ export function ResumeDocumentContent({ snapshot }: { snapshot: ParsedSnapshot }
     >
       {snapshot.header && (
         <header className="resume-print-header" style={{ textAlign: "center" }}>
-          <div style={{ fontSize: style.name_font_size_pt * PT_TO_PX, fontWeight: 700 }}>
+          <div style={{ fontSize: style.name_font_size_pt * PT_TO_PX, fontWeight: 700, fontVariant: "small-caps" }}>
             {snapshot.header.full_name ?? ""}
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0 10px", marginTop: 2 }}>
-            {snapshot.header.email && <span>{snapshot.header.email}</span>}
-            {snapshot.header.phone && <span>{snapshot.header.phone}</span>}
-            {snapshot.header.location && <span>{snapshot.header.location}</span>}
-            {/* Real anchors, so the PDF keeps clickable links and selectable text. */}
-            {snapshot.header.linkedin_url && <PrintLink href={snapshot.header.linkedin_url} />}
-            {snapshot.header.github_url && <PrintLink href={snapshot.header.github_url} />}
-            {snapshot.header.portfolio_url && <PrintLink href={snapshot.header.portfolio_url} />}
-            {snapshot.header.custom_links.links.map((link, i) => (
-              <PrintLink key={i} href={link.url} label={link.label} />
-            ))}
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: "0 6px", marginTop: 2, fontSize: "0.91em" }}>
+            {[
+              snapshot.header.phone && <span key="phone">{snapshot.header.phone}</span>,
+              snapshot.header.email && <a key="email" href={`mailto:${snapshot.header.email}`}>{snapshot.header.email}</a>,
+              snapshot.header.location && <span key="location">{snapshot.header.location}</span>,
+              // Real anchors, so the PDF keeps clickable links and selectable text.
+              snapshot.header.linkedin_url && <PrintLink key="linkedin" href={snapshot.header.linkedin_url} />,
+              snapshot.header.github_url && <PrintLink key="github" href={snapshot.header.github_url} />,
+              snapshot.header.portfolio_url && <PrintLink key="portfolio" href={snapshot.header.portfolio_url} />,
+              ...snapshot.header.custom_links.links.map((link, i) => (
+                <PrintLink key={`custom-${i}`} href={link.url} label={link.label} />
+              )),
+            ]
+              .filter(Boolean)
+              .map((node, i) => (
+                <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  {i > 0 && <span aria-hidden="true" style={{ color: "#444" }}>|</span>}
+                  {node}
+                </span>
+              ))}
           </div>
         </header>
       )}
@@ -115,21 +124,21 @@ export function ResumeDocumentContent({ snapshot }: { snapshot: ParsedSnapshot }
               className="resume-print-section-heading"
               style={{
                 fontSize: style.heading_font_size_pt * PT_TO_PX,
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.03em",
+                fontWeight: 400,
+                fontVariant: "small-caps",
                 borderBottom: "1px solid #000",
                 marginBottom: 4,
               }}
             >
               {section.title}
             </h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingLeft: "0.15in" }}>
               {section.entries.map((entry, ei) => (
                 <PrintEntry
                   key={ei}
                   entry={entry}
                   layout={section.layout_kind}
+                  projectHeading={isProjectSection(section.title)}
                   dateFormat={style.date_format}
                   bulletGapPx={BULLET_GAP_PT[style.bullet_spacing] * PT_TO_PX}
                 />
@@ -140,6 +149,10 @@ export function ResumeDocumentContent({ snapshot }: { snapshot: ParsedSnapshot }
       </div>
     </div>
   );
+}
+
+export function isProjectSection(title: string): boolean {
+  return /project/i.test(title);
 }
 
 /**
@@ -167,17 +180,19 @@ function PrintLink({ href, label }: { href: string; label?: string }) {
 function PrintEntry({
   entry,
   layout,
+  projectHeading,
   dateFormat,
   bulletGapPx,
 }: {
   entry: SnapshotEntry;
   layout: "entry" | "education" | "skills";
+  projectHeading: boolean;
   dateFormat: Parameters<typeof formatDateRange>[2];
   bulletGapPx: number;
 }) {
   if (layout === "skills") {
     return (
-      <div className="resume-print-entry" style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <div className="resume-print-entry" style={{ display: "flex", flexDirection: "column", gap: 2, fontSize: "0.91em" }}>
         {(entry.skills_data?.categories ?? []).map((cat, i) => (
           <div key={i}>
             <span style={{ fontWeight: 700 }}>{cat.label}: </span>
@@ -191,19 +206,39 @@ function PrintEntry({
   const dates = formatDateRange(entry.start_date, entry.end_date, dateFormat);
   const edu = entry.education_data;
 
+  // Jake's \resumeProjectHeading: "Name | tech stack" on one line, dates right.
+  const oneLine = layout === "entry" && projectHeading && !entry.location;
+
   return (
     <div className="resume-print-entry">
       <div className="resume-print-entry-head">
+        {oneLine ? (
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+            <span>
+              <span style={{ fontWeight: 700 }}>{entry.title ?? ""}</span>
+              {entry.organization && (
+                <>
+                  {" | "}
+                  <span style={{ fontStyle: "italic" }}>{entry.organization}</span>
+                </>
+              )}
+            </span>
+            {dates && <span>{dates}</span>}
+          </div>
+        ) : (
+        <>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
           <span style={{ fontWeight: 700 }}>{entry.title ?? ""}</span>
-          {dates && <span style={{ fontStyle: "italic" }}>{dates}</span>}
+          {/* Jake's template: education puts the location on the first row and
+              the dates on the italic second row; everything else is the reverse. */}
+          {layout === "education" ? entry.location && <span>{entry.location}</span> : dates && <span>{dates}</span>}
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-          <span style={{ fontStyle: "italic" }}>
-            {layout === "education" ? educationSubtitle(edu) : (entry.organization ?? "")}
-          </span>
-          {entry.location && <span style={{ fontStyle: "italic" }}>{entry.location}</span>}
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontStyle: "italic", fontSize: "0.91em" }}>
+          <span>{layout === "education" ? educationSubtitle(edu) : (entry.organization ?? "")}</span>
+          {layout === "education" ? dates && <span>{dates}</span> : entry.location && <span>{entry.location}</span>}
         </div>
+        </>
+        )}
       </div>
 
       {layout === "education" && <EducationExtraLines edu={edu} />}
@@ -211,7 +246,7 @@ function PrintEntry({
       {entry.subtitle && <div>{entry.subtitle}</div>}
 
       {entry.bullets.length > 0 && (
-        <ul>
+        <ul style={{ fontSize: "0.91em" }}>
           {entry.bullets.map((b, i) => (
             <li key={i} className="resume-print-bullet" style={{ marginBottom: bulletGapPx }}>
               {b.content}

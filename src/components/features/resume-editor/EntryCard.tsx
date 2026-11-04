@@ -7,6 +7,7 @@ import { SortableItem } from "./dnd/SortableItem";
 import { BulletList } from "./BulletList";
 import { LibraryUpdateDialog } from "./LibraryUpdateDialog";
 import { EducationExtraLines } from "./EducationExtras";
+import { isProjectSection } from "./PrintDocument";
 import { SaveEntryToLibraryDialog } from "./SaveEntryToLibraryDialog";
 import { MonthPicker } from "@/components/ui/date-picker";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -118,7 +119,7 @@ export function EntryCard({
           </EntryIconBtn>
         </div>
 
-        {section.layout_kind === "entry" && <EntryLayout entry={entry} onUpdate={(p) => updateEntry(entry.id, p)} dateFormat={style.date_format} />}
+        {section.layout_kind === "entry" && <EntryLayout entry={entry} onUpdate={(p) => updateEntry(entry.id, p)} dateFormat={style.date_format} projectHeading={isProjectSection(section.title) && !entry.location} />}
         {section.layout_kind === "education" && <EducationLayout entry={entry} onUpdate={(p) => updateEntry(entry.id, p)} dateFormat={style.date_format} />}
         {section.layout_kind === "skills" && <SkillsLayout entry={entry} onUpdate={(p) => updateEntry(entry.id, p)} />}
 
@@ -139,11 +140,11 @@ export function EntryCard({
 
 type UpdateFn = (patch: Partial<Pick<ResumeEntry, "title" | "subtitle" | "organization" | "location" | "start_date" | "end_date" | "education_data" | "skills_data">>) => void;
 
-function DateRangeEditor({ entry, onUpdate, dateFormat }: { entry: ResumeEntry; onUpdate: UpdateFn; dateFormat: import("@/lib/resume/types").StyleSettings["date_format"] }) {
+function DateRangeEditor({ entry, onUpdate, dateFormat, italic }: { entry: ResumeEntry; onUpdate: UpdateFn; dateFormat: import("@/lib/resume/types").StyleSettings["date_format"]; italic?: boolean }) {
   const preview = formatDateRange(entry.start_date, entry.end_date, dateFormat);
   const entryLabel = entry.title || entry.organization || "Untitled entry";
   return (
-    <span className="inline-flex items-center gap-1 whitespace-nowrap text-right" style={{ fontStyle: "italic" }}>
+    <span className="inline-flex items-center gap-1 whitespace-nowrap text-right" style={italic ? { fontStyle: "italic" } : undefined}>
       <MonthPicker
         aria-label={`${entryLabel} start month`}
         value={entry.start_date}
@@ -170,14 +171,26 @@ function DateRangeEditor({ entry, onUpdate, dateFormat }: { entry: ResumeEntry; 
   );
 }
 
-function EntryLayout({ entry, onUpdate, dateFormat }: { entry: ResumeEntry; onUpdate: UpdateFn; dateFormat: import("@/lib/resume/types").StyleSettings["date_format"] }) {
+function EntryLayout({ entry, onUpdate, dateFormat, projectHeading }: { entry: ResumeEntry; onUpdate: UpdateFn; dateFormat: import("@/lib/resume/types").StyleSettings["date_format"]; projectHeading: boolean }) {
+  if (projectHeading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+        <span style={{ display: "flex", flex: 1, minWidth: 0, alignItems: "baseline", gap: 6 }}>
+          <input value={entry.title ?? ""} onChange={(e) => onUpdate({ title: e.target.value })} placeholder="Project name" aria-label="Entry title" style={{ ...inputStyle, fontWeight: 700, width: `${Math.max(12, (entry.title ?? "").length + 1)}ch` }} />
+          <span aria-hidden="true">|</span>
+          <input value={entry.organization ?? ""} onChange={(e) => onUpdate({ organization: e.target.value })} placeholder="Tech stack" aria-label="Organization" style={{ ...inputStyle, fontStyle: "italic", flex: 1, minWidth: 0 }} />
+        </span>
+        <DateRangeEditor entry={entry} onUpdate={onUpdate} dateFormat={dateFormat} />
+      </div>
+    );
+  }
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
         <input value={entry.title ?? ""} onChange={(e) => onUpdate({ title: e.target.value })} placeholder="Title / Role" aria-label="Entry title" style={{ ...inputStyle, fontWeight: 700, flex: 1, minWidth: 0 }} />
         <DateRangeEditor entry={entry} onUpdate={onUpdate} dateFormat={dateFormat} />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: "0.91em" }}>
         <input value={entry.organization ?? ""} onChange={(e) => onUpdate({ organization: e.target.value })} placeholder="Organization" aria-label="Organization" style={{ ...inputStyle, fontStyle: "italic", flex: 1, minWidth: 0 }} />
         <input value={entry.location ?? ""} onChange={(e) => onUpdate({ location: e.target.value })} placeholder="Location" aria-label="Location" style={{ ...inputStyle, fontStyle: "italic", textAlign: "right", width: "20ch" }} />
       </div>
@@ -192,9 +205,9 @@ function EducationLayout({ entry, onUpdate, dateFormat }: { entry: ResumeEntry; 
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
         <input value={entry.title ?? ""} onChange={(e) => onUpdate({ title: e.target.value })} placeholder="School / University" aria-label="School" style={{ ...inputStyle, fontWeight: 700, flex: 1, minWidth: 0 }} />
-        <DateRangeEditor entry={entry} onUpdate={onUpdate} dateFormat={dateFormat} />
+        <input value={entry.location ?? ""} onChange={(e) => onUpdate({ location: e.target.value })} placeholder="Location" aria-label="Location" style={{ ...inputStyle, textAlign: "right", width: "18ch" }} />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: "0.91em" }}>
         <span style={{ display: "flex", flex: 1, alignItems: "baseline", fontStyle: "italic" }}>
           <input
             value={edu.degree ?? ""}
@@ -208,10 +221,10 @@ function EducationLayout({ entry, onUpdate, dateFormat }: { entry: ResumeEntry; 
               what PrintDocument actually renders, instead of silently hiding it. */}
           {edu.field_of_study && <span>{edu.degree ? ", " : ""}{edu.field_of_study}</span>}
         </span>
-        <input value={entry.location ?? ""} onChange={(e) => onUpdate({ location: e.target.value })} placeholder="Location" aria-label="Location" style={{ ...inputStyle, fontStyle: "italic", textAlign: "right", width: "18ch" }} />
+        <DateRangeEditor entry={entry} onUpdate={onUpdate} dateFormat={dateFormat} italic />
       </div>
 
-      <EducationExtraLines edu={edu} />
+      <EducationExtraLines edu={edu} onChange={setEdu} />
     </div>
   );
 }

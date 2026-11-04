@@ -143,7 +143,7 @@ test("parseSnapshot: an out-of-range style setting falls back to the documented 
   assert.equal(res.ok, true);
   if (!res.ok) return;
   assert.equal(res.snapshot.resume.style_settings.body_font_size_pt, 11);
-  assert.equal(res.snapshot.resume.style_settings.line_spacing, "standard");
+  assert.equal(res.snapshot.resume.style_settings.line_spacing, "compact");
 });
 
 test("parseSnapshot: an unknown target_length falls back to one_page", () => {

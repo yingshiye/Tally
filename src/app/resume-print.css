@@ -138,7 +138,7 @@
      header already shows the address and a duplicate confuses an ATS. */
   .resume-print-document a {
     color: #000;
-    text-decoration: none;
+    text-decoration: underline;
   }
 
   .resume-print-document a::after {

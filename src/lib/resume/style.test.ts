@@ -39,12 +39,11 @@ test("valid user-selected values are preserved", () => {
   assert.equal(s.date_format, "YYYY");
 });
 
-test("date_format defaults to 'MM YYYY' and accepts the English long-month format", () => {
-  assert.equal(normalizeStyleSettings({}).date_format, "MM YYYY");
+test("date_format defaults to 'MMM YYYY' and accepts the other supported formats", () => {
+  assert.equal(normalizeStyleSettings({}).date_format, "MMM YYYY");
   assert.equal(normalizeStyleSettings({ date_format: "MMMM YYYY" }).date_format, "MMMM YYYY");
-  // An unsupported abbreviated value still falls back to the default.
-  assert.equal(normalizeStyleSettings({ date_format: "MMM YYYY" }).date_format, "MM YYYY");
-  assert.equal(normalizeStyleSettings({ date_format: "garbage" }).date_format, "MM YYYY");
+  assert.equal(normalizeStyleSettings({ date_format: "MM YYYY" }).date_format, "MM YYYY");
+  assert.equal(normalizeStyleSettings({ date_format: "garbage" }).date_format, "MMM YYYY");
 });
 
 test("unknown properties are dropped on normalization", () => {
@@ -56,7 +55,7 @@ test("unknown properties are dropped on normalization", () => {
 });
 
 test("out-of-range enum values coerce to defaults", () => {
-  assert.equal(normalizeStyleSettings({ line_spacing: "loose" }).line_spacing, "standard");
-  assert.equal(normalizeStyleSettings({ section_spacing: "huge" }).section_spacing, "standard");
+  assert.equal(normalizeStyleSettings({ line_spacing: "loose" }).line_spacing, "compact");
+  assert.equal(normalizeStyleSettings({ section_spacing: "huge" }).section_spacing, "tight");
   assert.equal(normalizeStyleSettings({ margin_in: 2 }).margin_in, 0.5);
 });

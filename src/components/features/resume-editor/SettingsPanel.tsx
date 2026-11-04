@@ -20,6 +20,7 @@ const TARGET_LABELS: Record<TargetLength, string> = {
 
 const DATE_FORMAT_EXAMPLE: Record<StyleSettings["date_format"], string> = {
   "MMMM YYYY": "June 2025",
+  "MMM YYYY": "Aug. 2025",
   "MM YYYY": "06 2025",
   "MM/YYYY": "06/2025",
   YYYY: "2025",

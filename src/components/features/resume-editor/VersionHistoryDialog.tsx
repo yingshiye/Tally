@@ -270,8 +270,8 @@ export function VersionHistoryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] min-w-0 overflow-hidden p-0 sm:max-w-[min(96vw,70rem)]">
-        <DialogHeader className="border-b px-5 py-4 pr-12">
+      <DialogContent className="flex max-h-[90vh] min-w-0 flex-col gap-0 overflow-hidden p-0 sm:max-w-[min(96vw,70rem)]">
+        <DialogHeader className="shrink-0 border-b px-5 py-4 pr-12">
           <DialogTitle>Version history</DialogTitle>
           <DialogDescription>
             Immutable snapshots of this resume. View one, compare it against the current draft or another version, or
@@ -279,7 +279,7 @@ export function VersionHistoryDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-w-0 overflow-y-auto px-5 pb-5">
+        <div className="min-h-0 min-w-0 flex-1 overflow-y-auto px-5 pb-5">
           {snapshotError && (
             <p role="alert" className="mt-4 text-sm text-red-600">
               {snapshotError}

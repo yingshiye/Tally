@@ -22,6 +22,12 @@ test("formatMonth: MMMM YYYY uses full English month names", () => {
   assert.equal(formatDateRange("2023-09-01", "2027-06-01", "MMMM YYYY"), "September 2023 – June 2027");
 });
 
+test("formatMonth: MMM YYYY → Jake-style abbreviations", () => {
+  assert.equal(formatMonth("2025-08-01", "MMM YYYY"), "Aug. 2025");
+  assert.equal(formatMonth("2025-06-01", "MMM YYYY"), "June 2025");
+  assert.equal(formatMonth("2025-09-01", "MMM YYYY"), "Sep. 2025");
+});
+
 test("formatMonth: MM/YYYY → '06/2025'", () => {
   assert.equal(formatMonth("2025-06-01", "MM/YYYY"), "06/2025");
 });

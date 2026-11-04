@@ -49,7 +49,7 @@ export function ResumeEditor({
     <EditorProvider initialDraft={initialDraft} library={library} tabId={tabId} userId={userId}>
       <MeasurementProvider>
         <ResumeMeasurementDocument />
-        <div className="flex h-screen flex-col">
+        <div className="flex h-[calc(100dvh-3.5rem)] flex-col md:h-dvh">
           <EditorTopBar userId={userId} />
           {application && <SubmitForApplicationPanel application={application} />}
 
@@ -79,7 +79,7 @@ export function ResumeEditor({
             ))}
           </div>
 
-          <div className={`grid flex-1 overflow-hidden ${settingsCollapsed ? "xl:grid-cols-[260px_1fr_44px]" : "xl:grid-cols-[260px_1fr_340px]"}`}>
+          <div className={`grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)] overflow-hidden ${settingsCollapsed ? "xl:grid-cols-[260px_1fr_44px]" : "xl:grid-cols-[260px_1fr_340px]"}`}>
             <div
               role="tabpanel"
               id="editor-pane-library"

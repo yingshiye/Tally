@@ -33,6 +33,7 @@ export function EditableHeader() {
         style={{
           fontSize: nameSize,
           fontWeight: 700,
+          fontVariant: "small-caps",
           textAlign: "center",
           width: "100%",
           border: "none",
@@ -41,39 +42,44 @@ export function EditableHeader() {
           fontFamily: "inherit",
         }}
       />
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0 10px", marginTop: 2 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: "0 6px", marginTop: 2, fontSize: "0.91em" }}>
         {(
           [
-            ["email", "Email", h.email],
             ["phone", "Phone", h.phone],
+            ["email", "Email", h.email],
             ["location", "Location", h.location],
             ["linkedin_url", "LinkedIn URL", h.linkedin_url],
             ["github_url", "GitHub URL", h.github_url],
             ["portfolio_url", "Portfolio URL", h.portfolio_url],
           ] as const
-        ).map(([field, label, value]) => (
-          <input
-            key={field}
-            value={value ?? ""}
-            onChange={(e) => updateHeader({ [field]: e.target.value })}
-            placeholder={label}
-            aria-label={label}
-            style={{
-              border: "none",
-              outline: "none",
-              background: "transparent",
-              fontFamily: "inherit",
-              fontSize: "inherit",
-              textAlign: "center",
-              width: `${Math.max(label.length, (value ?? "").length) + 1}ch`,
-            }}
-          />
+        ).map(([field, label, value], i) => (
+          <span key={field} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            {i > 0 && <span aria-hidden="true" style={{ color: "#888" }}>|</span>}
+            <input
+              value={value ?? ""}
+              onChange={(e) => updateHeader({ [field]: e.target.value })}
+              placeholder={label}
+              aria-label={label}
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                fontFamily: "inherit",
+                fontSize: "inherit",
+                textAlign: "center",
+                width: `${Math.max(label.length, (value ?? "").length) + 1}ch`,
+              }}
+            />
+          </span>
         ))}
         {/* Custom links are read-only here and edited in their own dialog:
             they are an ordered list, and inline reordering inside the page
             header would fight the resume layout. */}
         {customLinks.map((link, i) => (
-          <span key={i}>{`${link.label}: ${link.url}`}</span>
+          <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span aria-hidden="true" style={{ color: "#888" }}>|</span>
+            <span>{`${link.label}: ${link.url}`}</span>
+          </span>
         ))}
       </div>
 

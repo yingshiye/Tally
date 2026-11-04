@@ -1,3 +1,5 @@
+import { X } from "lucide-react";
+import { Tooltip } from "@/components/ui/tooltip";
 import type { EducationData } from "@/lib/resume/types";
 
 /**
@@ -16,18 +18,45 @@ export function educationSubtitle(edu: Pick<EducationData, "degree" | "field_of_
  * is rendered (live editor, version snapshots, print/export) so it can never
  * be visible in one and silently missing in another.
  */
-export function EducationExtraLines({ edu }: { edu: EducationData | null | undefined }) {
+export function EducationExtraLines({
+  edu,
+  onChange,
+}: {
+  edu: EducationData | null | undefined;
+  /** Editor only: when given, each line gets a remove button (hidden in print). */
+  onChange?: (patch: Partial<EducationData>) => void;
+}) {
   if (!edu) return null;
-  const hasAny =
-    edu.minor || edu.gpa || (edu.honors && edu.honors.length > 0) || (edu.coursework && edu.coursework.length > 0) || (edu.details && edu.details.length > 0);
-  if (!hasAny) return null;
+  const lines: { key: string; text: string; clear: Partial<EducationData> }[] = [];
+  if (edu.minor) lines.push({ key: "minor", text: `Minor: ${edu.minor}`, clear: { minor: "" } });
+  if (edu.gpa) lines.push({ key: "gpa", text: `GPA: ${edu.gpa}`, clear: { gpa: "" } });
+  if (edu.honors && edu.honors.length > 0) lines.push({ key: "honors", text: `Honors: ${edu.honors.join(", ")}`, clear: { honors: [] } });
+  if (edu.coursework && edu.coursework.length > 0) {
+    lines.push({ key: "coursework", text: `Relevant coursework: ${edu.coursework.join(", ")}`, clear: { coursework: [] } });
+  }
+  edu.details?.forEach((d, i) =>
+    lines.push({ key: `detail-${i}`, text: d, clear: { details: edu.details!.filter((_, j) => j !== i) } }),
+  );
+  if (lines.length === 0) return null;
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      {edu.minor && <span>Minor: {edu.minor}</span>}
-      {edu.gpa && <span>GPA: {edu.gpa}</span>}
-      {edu.honors && edu.honors.length > 0 && <span>Honors: {edu.honors.join(", ")}</span>}
-      {edu.coursework && edu.coursework.length > 0 && <span>Relevant coursework: {edu.coursework.join(", ")}</span>}
-      {edu.details?.map((d, i) => <span key={i}>{d}</span>)}
+      {lines.map((line) => (
+        <span key={line.key} className="group/extra">
+          {line.text}
+          {onChange && (
+            <Tooltip label="Remove this line">
+              <button
+                type="button"
+                aria-label={`Remove: ${line.text}`}
+                onClick={() => onChange(line.clear)}
+                className="ml-1.5 inline-flex align-middle text-gray-400 opacity-0 hover:text-gray-700 focus:opacity-100 group-hover/extra:opacity-100 print:hidden"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Tooltip>
+          )}
+        </span>
+      ))}
     </div>
   );
 }

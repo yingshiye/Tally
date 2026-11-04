@@ -65,9 +65,8 @@ export function SectionBlock({
             aria-label="Section title"
             style={{
               fontSize: headingSize,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.03em",
+              fontWeight: 400,
+              fontVariant: "small-caps",
               border: "none",
               outline: "none",
               background: "transparent",
@@ -90,7 +89,7 @@ export function SectionBlock({
 
         {deleteError && <p className="mb-1 text-xs text-red-600">{deleteError}</p>}
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingLeft: "0.15in" }}>
           <SortableList
             id={`entries:${section.id}`}
             ids={entryIds}

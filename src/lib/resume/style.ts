@@ -23,17 +23,18 @@ export const HEADING_FONT_SIZES: readonly HeadingFontSizePt[] = [10, 11, 12, 13,
 export const MARGINS: readonly MarginIn[] = [0.4, 0.5, 0.6, 0.7, 0.75, 1];
 export const LINE_SPACINGS: readonly LineSpacing[] = ["compact", "standard", "comfortable"];
 export const BLOCK_SPACINGS: readonly BlockSpacing[] = ["tight", "standard", "wide"];
-export const DATE_FORMATS: readonly DateFormat[] = ["MMMM YYYY", "MM YYYY", "MM/YYYY", "YYYY"];
+export const DATE_FORMATS: readonly DateFormat[] = ["MMMM YYYY", "MMM YYYY", "MM YYYY", "MM/YYYY", "YYYY"];
 
+// Defaults mirror Jake's Resume (11 pt body, 24 pt name, 12 pt headings, 0.5in margins, tight spacing).
 export const DEFAULT_STYLE_SETTINGS: StyleSettings = {
   body_font_size_pt: 11,
-  name_font_size_pt: 20,
+  name_font_size_pt: 24,
   heading_font_size_pt: 12,
   margin_in: 0.5,
-  line_spacing: "standard",
-  section_spacing: "standard",
-  bullet_spacing: "standard",
-  date_format: "MM YYYY",
+  line_spacing: "compact",
+  section_spacing: "tight",
+  bullet_spacing: "tight",
+  date_format: "MMM YYYY",
 };
 
 function pickNumber<T extends number>(value: unknown, allowed: readonly T[], fallback: T): T {

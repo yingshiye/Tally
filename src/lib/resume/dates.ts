@@ -63,6 +63,8 @@ export function formatMonth(value: string | null | undefined, format: DateFormat
   switch (format) {
     case "MMMM YYYY":
       return `${ENGLISH_MONTHS[ym.month - 1]} ${yyyy}`;
+    case "MMM YYYY":
+      return `${JAKE_MONTHS[ym.month - 1]} ${yyyy}`;
     case "MM YYYY":
       return `${mm} ${yyyy}`;
     case "MM/YYYY":
@@ -71,6 +73,12 @@ export function formatMonth(value: string | null | undefined, format: DateFormat
       return yyyy;
   }
 }
+
+// Jake's Resume style: short names get a period, short words are spelled out.
+const JAKE_MONTHS = [
+  "Jan.", "Feb.", "March", "April", "May", "June",
+  "July", "Aug.", "Sep.", "Oct.", "Nov.", "Dec.",
+] as const;
 
 const ENGLISH_MONTHS = [
   "January", "February", "March", "April", "May", "June",
