@@ -1,94 +1,87 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code (claude.ai/code) when working in this repository.
 
-## Project Overview
+## Project overview
 
-A full-stack internship application tracker. Users log internship applications, track their status, add notes, and get an at-a-glance view of their pipeline.
+A full-stack internship search tracker, live in production. Users log applications and track status, keep a library of resume blocks and build tailored one-page resumes, work through a NeetCode 150 OA-prep list, and watch company careers pages for changes.
 
-**Stack:** Next.js 16 (App Router) · Supabase (Postgres + Auth + Realtime) · Vercel (deployment) · TypeScript · Tailwind CSS v4 · shadcn/ui (Nova preset)
+**Stack:** Next.js 16 (App Router) · Supabase (Postgres + Auth + Realtime) · Vercel · TypeScript · Tailwind CSS v4 · shadcn/ui (Nova preset)
 
-**Status:** Scaffolded. Auth pages, dashboard, and all core components are built. Pending: Supabase credentials in `.env.local` and running the DB migration against your Supabase project.
+This is not the Next.js you know — read `AGENTS.md` and the relevant guide in `node_modules/next/dist/docs/` before framework-level changes.
 
-## Bootstrap (first-time setup)
+## Before changing UI
+
+Read **`DESIGN.md`** (design language, patterns, tables, status colors) and **`TASTE.md`** (review checklist) first. They are the source of truth for UI; do not restate their rules here. Workflow for UI work:
+
+1. Inspect the current route, components, and data flow.
+2. Show a visual mockup with fictional data first; do not change the site until the user picks an option.
+3. Implement only what was picked, one surface at a time, reusing existing components and tokens.
+4. Verify in the logged-in local browser: wide, narrow (390px), dark mode, plus empty/long-text cases.
+
+## Common commands
 
 ```bash
-npx create-next-app@latest . --typescript --tailwind --app --src-dir --import-alias "@/*"
-npm install @supabase/ssr @supabase/supabase-js
-npx supabase init
-npx shadcn@latest init
-cp .env.example .env.local   # then fill in Supabase URL + anon key
-```
+npm run dev                # dev server at localhost:3000
+npm run build              # production build
+npm run lint               # ESLint (the repo-wide run is noisy from .claude/worktrees; lint touched files)
+npx tsc --noEmit           # type check (there is no type-check script)
+npm test                   # unit tests (tsx --test)
+npm run test:e2e           # Playwright
 
-## Common Commands
-
-```bash
-# Development
-npm run dev           # Start dev server at localhost:3000
-npm run build         # Production build
-npm run lint          # ESLint
-npm run type-check    # tsc --noEmit
-
-# Supabase local stack (requires Docker)
-npx supabase start    # Start local Supabase (Postgres + Auth + Studio)
-npx supabase stop
-npx supabase db reset # Reset local DB and re-run all migrations
+# Supabase
+npx supabase start | stop
+npx supabase db reset                                        # local reset + re-run migrations
 npx supabase gen types typescript --local > src/types/supabase.ts
 npx supabase migration new <name>
-npx supabase db push  # Push migrations to remote (prod)
+npx supabase db push                                         # remote — only with explicit user approval
 ```
 
 ## Architecture
 
-### Next.js App Router layout
-
 ```
 src/
   app/
-    (auth)/           # Route group: login, signup — no nav shell
-      login/
-      signup/
-    (dashboard)/      # Route group: protected pages with sidebar nav
-      dashboard/      # Main kanban/list tracker view
-      applications/   # CRUD for individual applications
-    layout.tsx        # Root layout — Supabase session provider wraps here
+    page.tsx              # marketing landing page (the only glass-styled page)
+    (auth)/               # login, signup, forgot/reset password — split layout, no nav shell
+    (dashboard)/          # protected pages inside DashboardShell (sidebar)
+      dashboard/          # applications: stats funnel, weekly chart, table, upcoming
+      prep/               # NeetCode 150 tracker
+      watchlist/          # careers-page monitoring
+      resumes/            # resume list + /resumes/[resumeId] editor
+      resume-blocks/      # reusable block library
+    api/
+      cron/check-jobs/    # scheduled watchlist check (see vercel.json)
+      extract-job/        # JD paste-to-autofill
   components/
-    ui/               # shadcn/ui primitives (Button, Card, Dialog, etc.)
-    features/         # Domain components (ApplicationCard, StatusBadge, etc.)
+    ui/                   # shadcn primitives
+    features/             # domain components; resume-editor/ holds the editor
   lib/
-    supabase/
-      client.ts       # Browser client — createBrowserClient (singleton)
-      server.ts       # Server client — createServerClient with cookies()
-  types/
-    supabase.ts       # Auto-generated — never hand-edit
-  proxy.ts            # Next.js 16 proxy (replaces middleware.ts) — refreshes session; guards (dashboard) routes
+    supabase/             # client.ts (browser singleton), server.ts (cookies)
+    resume/               # editor domain logic, measurement, versions, export (unit-tested)
+    prep/                 # NeetCode 150 data
+    format/relative.ts    # relative day helpers (formatUntil / formatAgo)
+    applications/         # next-event helper
+  types/supabase.ts       # generated — never hand-edit
+  proxy.ts                # Next.js 16 proxy (replaces middleware.ts): refreshes the session and guards /dashboard; the other (dashboard) pages redirect to /login themselves in their server component
+supabase/migrations/      # schema source of truth
+e2e/                      # Playwright specs
 ```
 
 ### Supabase integration pattern
 
-- **Server Components / Route Handlers:** import from `lib/supabase/server.ts` — it reads cookies via `next/headers`.
-- **Client Components:** import from `lib/supabase/client.ts` — singleton browser client, safe to call repeatedly.
-- **Auth flow:** email/password via Supabase Auth; `@supabase/ssr` keeps the JWT in cookies so Server Components can read it. `proxy.ts` (Next.js 16's replacement for `middleware.ts`) calls `supabase.auth.getUser()` on every request to refresh the token and guard protected routes.
-- **Row-Level Security:** every table has RLS enabled. The only policy needed for user data is `auth.uid() = user_id`.
-- **Type safety:** always import from `src/types/supabase.ts`; run `supabase gen types` after any schema change and commit the result.
+- **Server Components / Route Handlers:** import from `lib/supabase/server.ts` (reads cookies via `next/headers`).
+- **Client Components:** import from `lib/supabase/client.ts` (singleton browser client).
+- **Auth:** email/password and Google via Supabase Auth; `@supabase/ssr` keeps the JWT in cookies. `proxy.ts` calls `supabase.auth.getUser()` on every request to refresh the token and guard protected routes.
+- **RLS:** every table has RLS enabled; user data policies are `auth.uid() = user_id`. RLS is the security boundary.
+- **Types:** import from `src/types/supabase.ts`; regenerate after any schema change and commit the result.
+- Some resume operations go through Postgres RPC functions (e.g. `create_resume`, `update_resume_metadata`); `applications.submitted_resume_version_id` is writable only via `set_application_resume_version`.
 
 ### Data model
 
-```sql
--- applications
-id          uuid primary key default gen_random_uuid()
-user_id     uuid references auth.users not null
-company     text not null
-role        text not null
-status      text not null  -- 'wishlist' | 'applied' | 'oa' | 'interview' | 'offer' | 'rejected'
-applied_date date
-url         text
-notes       text
-created_at  timestamptz default now()
-updated_at  timestamptz default now()
-```
+Tables (see `src/types/supabase.ts` and `supabase/migrations/` for columns): `applications`, `events`, `user_watchlist`, `url_snapshots`, `study_task_progress`, `user_field_options`, `resumes`, `resume_headers`, `resume_sections`, `resume_entries`, `resume_entry_bullets`, `resume_versions`, `resume_library_blocks`, `resume_library_bullets`.
 
-Enable RLS and add a single policy: `auth.uid() = user_id` for SELECT/INSERT/UPDATE/DELETE.
+Application status is one of `wishlist | applied | oa | interview | offer | rejected`.
 
 ### Environment variables
 
@@ -96,44 +89,25 @@ Enable RLS and add a single policy: `auth.uid() = user_id` for SELECT/INSERT/UPD
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=   # server-only; never expose to client
+ANTHROPIC_API_KEY=           # /api/extract-job (server-only)
+CRON_SECRET=                 # authorizes /api/cron/check-jobs (server-only)
 ```
 
-`.env.local` for local dev. Mirror these in Vercel project settings for production.
+`.env.local` for local dev; mirror in Vercel project settings for production.
 
 ## Key conventions
 
 - App Router only — no `pages/` directory.
 - Default to Server Components; add `"use client"` only for interactivity or browser APIs.
-- All DB reads/writes go directly through the Supabase client — no custom API layer. RLS is the security boundary.
-- Migrations in `supabase/migrations/` are the schema source of truth — never mutate production DB directly.
-- `updated_at` column: add a Postgres trigger (`moddatetime` extension) rather than setting it in application code.
+- All DB reads/writes go through the Supabase client — no custom API layer beyond the routes above.
+- Migrations are the schema source of truth — never mutate the production DB directly.
+- `updated_at` is maintained by a Postgres trigger (`moddatetime`), not application code.
+- Preserve routes, Supabase behavior, data contracts, and business logic unless a task explicitly changes them.
+- Use design tokens from `src/app/globals.css`, not hardcoded colors.
 
-## UI preferences
+## Working agreements
 
-Follow these for any UI change. Design docs: DESIGN.md / TASTE.md; tokens live in `src/app/globals.css`.
-
-**Style**
-- Prefer visuals over text: progress bars, dots, icons, rings, relative time (`3d ago`, `in 2 days`).
-- Restrained: one blue accent, no gradients/glow/glass, no card-per-row. Exception: the marketing landing page (`src/app/page.tsx`) uses frosted glass over soft color blobs; keep glass fills ~60% opaque so text contrast holds, and never use glass inside the app.
-- Only show real data in stats and charts; never fabricate numbers.
-- Use design tokens (`bg-success`, `text-warning-text`, …), not hardcoded colors.
-
-**Workflow**
-- Show a visual mockup first (no website changes). Implement only what the user picks.
-- When asked for options, show several and discuss them one at a time.
-- Mockups and screenshots use fictional data only — never expose real applications.
-
-**Tables**
-- Must fit full-screen width: no horizontal scroll, fixed column widths (`table-fixed`), long text wraps instead of widening columns.
-- Header stays visible (sticky); no nested scroll box inside the page.
-- Narrow screens: hide secondary columns instead of scrolling sideways; keep their info as a small meta line under the name.
-- Controls must line up across rows — give variable-length content (e.g. dot counts) a fixed width.
-
-**Specifics**
-- Applied column shows the actual date, not relative time.
-- Status colors: applied = info, OA = primary, interview = warning, offer = success, rejected = danger.
-- Rejected is shown apart from the forward pipeline.
-- Every icon-only button needs a hover tooltip with a short description.
-
-**Verify**
-- Check changes in the logged-in local browser at wide, narrow (390px), and dark mode before reporting done.
+- Do not start a next step, or touch the remote Supabase project, without explicit user approval.
+- Do not add a `Co-Authored-By: Claude` trailer to commits or PRs.
+- Commit only when asked, and only the files you changed.
+- Mockups, screenshots, and demo pages use fictional data; remove temporary preview routes when done.
