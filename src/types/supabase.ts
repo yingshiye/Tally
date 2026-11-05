@@ -216,6 +216,7 @@ export type Database = {
           task_id: string;
           status: "not_started" | "review" | "completed";
           completed_at: string | null;
+          notes: string | null;
           updated_at: string;
         };
         Insert: {
@@ -223,6 +224,7 @@ export type Database = {
           task_id: string;
           status?: "not_started" | "review" | "completed";
           completed_at?: string | null;
+          notes?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -230,6 +232,7 @@ export type Database = {
           task_id?: string;
           status?: "not_started" | "review" | "completed";
           completed_at?: string | null;
+          notes?: string | null;
           updated_at?: string;
         };
         Relationships: [];
