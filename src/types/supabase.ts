@@ -210,6 +210,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      prep_shares: {
+        Row: {
+          user_id: string;
+          token: string;
+          display_name: string | null;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          token?: string;
+          display_name?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          token?: string;
+          display_name?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       study_task_progress: {
         Row: {
           user_id: string;
@@ -470,6 +491,14 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      get_public_prep_share: {
+        Args: { p_token: string };
+        Returns: {
+          display_name: string | null;
+          completed_ids: string[];
+          solved_last_7d: number;
+        }[];
+      };
       create_resume: {
         Args: { p_name: string; p_target_company?: string | null; p_target_role?: string | null };
         Returns: { resume_id: string; revision: number }[];
