@@ -7,7 +7,12 @@ import { useMeasurements } from "./MeasurementContext";
 import { EditableHeader } from "./EditableHeader";
 import { SectionBlock } from "./SectionBlock";
 import { SortableList } from "./dnd/SortableList";
-import { PAGE_WIDTH_PX, DPI, printableHeightPx, targetPageLimit } from "@/lib/resume/measure";
+import {
+  PAGE_WIDTH_PX,
+  DPI,
+  printableHeightPx,
+  targetPageLimit,
+} from "@/lib/resume/measure";
 import { LINE_HEIGHT, SECTION_GAP_PT } from "@/lib/resume/style";
 import { Tooltip } from "@/components/ui/tooltip";
 
@@ -45,14 +50,25 @@ export function ResumePreview() {
   const printable = printableHeightPx(style.margin_in);
   const limit = targetPageLimit(draft.resume.target_length);
   const overTarget = limit !== null && measurements.pageCount > limit;
+  // Fill is measured against the target length (or the current page count when
+  // there is no target), using the same measurement as the Resume Check.
+  const capacityPages = limit ?? measurements.pageCount;
+  const fillPercent = Math.round(
+    ((measurements.pageCount - 1 + measurements.nearOverflowRatio) /
+      capacityPages) *
+      100,
+  );
 
   // One boundary line per page break. Positioned from the same printable
   // height the page-count maths uses, so the indicator and the warning can
   // never disagree about where page 2 starts.
-  const boundaries = Array.from({ length: Math.max(0, measurements.pageCount - 1) }, (_, i) => ({
-    index: i + 1,
-    top: pagePadding + (i + 1) * printable,
-  }));
+  const boundaries = Array.from(
+    { length: Math.max(0, measurements.pageCount - 1) },
+    (_, i) => ({
+      index: i + 1,
+      top: pagePadding + (i + 1) * printable,
+    }),
+  );
 
   const pageStyle: React.CSSProperties = {
     width: PAGE_WIDTH_PX,
@@ -67,21 +83,43 @@ export function ResumePreview() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex items-center border-b border-gray-100 px-3 py-1.5 text-xs print:hidden dark:border-gray-800">
+      <div className="flex items-center gap-3 border-b border-border px-3 py-1.5 text-xs print:hidden">
         <span
-          className={`flex items-center gap-1.5 ${overTarget ? "text-amber-700 dark:text-amber-400" : "text-gray-500"}`}
+          className={`flex shrink-0 items-center gap-1.5 ${overTarget ? "text-warning-text" : "text-muted-foreground"}`}
           role="status"
           aria-live="polite"
         >
           {overTarget && <AlertTriangle className="h-3.5 w-3.5" />}
           {measurements.pageCount} page{measurements.pageCount === 1 ? "" : "s"}
-          {limit !== null && ` · target ${limit} page${limit > 1 ? "s" : ""}`}
+          {limit !== null && ` of ${limit}`}
           {overTarget && " — over target"}
+        </span>
+        <div
+          className="h-1.5 w-40 overflow-hidden rounded-full bg-muted"
+          role="img"
+          aria-label={`${fillPercent}% of the target length used`}
+        >
+          <div
+            className={`h-full rounded-full transition-[width] duration-[250ms] ${
+              overTarget
+                ? "bg-danger"
+                : fillPercent >= 85
+                  ? "bg-warning"
+                  : "bg-success"
+            }`}
+            style={{ width: `${Math.min(100, fillPercent)}%` }}
+          />
+        </div>
+        <span className="tabular-nums text-muted-foreground">
+          {fillPercent}% full
         </span>
       </div>
 
       <div className="relative flex-1 overflow-hidden">
-        <div ref={scrollRef} className="h-full overflow-auto bg-gray-100 p-8 dark:bg-gray-900">
+        <div
+          ref={scrollRef}
+          className="h-full overflow-auto bg-gray-100 p-8 dark:bg-gray-900"
+        >
           {/* Zoom scales the rendered page without changing its layout width, so
               measurement keeps working in real Letter pixels at any zoom. */}
           <div
@@ -92,7 +130,10 @@ export function ResumePreview() {
               transformOrigin: "top left",
             }}
           >
-            <div className="relative shadow-sm ring-1 ring-gray-200 dark:ring-gray-700" style={pageStyle}>
+            <div
+              className="relative shadow-sm ring-1 ring-gray-200 dark:ring-gray-700"
+              style={pageStyle}
+            >
               {boundaries.map((b) => (
                 <div
                   key={b.index}
@@ -101,7 +142,9 @@ export function ResumePreview() {
                   style={{ top: b.top }}
                 >
                   <div className="border-t border-dashed border-red-300" />
-                  <span className="absolute right-1 -top-4 text-[10px] text-red-400">page {b.index + 1}</span>
+                  <span className="absolute right-1 -top-4 text-[10px] text-red-400">
+                    page {b.index + 1}
+                  </span>
                 </div>
               ))}
 
@@ -150,7 +193,9 @@ export function ResumePreview() {
               </button>
             </span>
           </Tooltip>
-          <span className="w-10 text-center tabular-nums text-gray-500">{Math.round(zoom * 100)}%</span>
+          <span className="w-10 text-center tabular-nums text-gray-500">
+            {Math.round(zoom * 100)}%
+          </span>
           <Tooltip label="Zoom in">
             <span className="inline-flex">
               <button
@@ -164,7 +209,10 @@ export function ResumePreview() {
               </button>
             </span>
           </Tooltip>
-          <span className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-600" aria-hidden />
+          <span
+            className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-600"
+            aria-hidden
+          />
           <button
             type="button"
             onClick={handleFit}

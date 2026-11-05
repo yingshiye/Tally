@@ -107,3 +107,33 @@ SUPABASE_SERVICE_ROLE_KEY=   # server-only; never expose to client
 - All DB reads/writes go directly through the Supabase client — no custom API layer. RLS is the security boundary.
 - Migrations in `supabase/migrations/` are the schema source of truth — never mutate production DB directly.
 - `updated_at` column: add a Postgres trigger (`moddatetime` extension) rather than setting it in application code.
+
+## UI preferences
+
+Follow these for any UI change. Design docs: DESIGN.md / TASTE.md; tokens live in `src/app/globals.css`.
+
+**Style**
+- Prefer visuals over text: progress bars, dots, icons, rings, relative time (`3d ago`, `in 2 days`).
+- Restrained: one blue accent, no gradients/glow/glass, no card-per-row. Exception: the marketing landing page (`src/app/page.tsx`) uses frosted glass over soft color blobs; keep glass fills ~60% opaque so text contrast holds, and never use glass inside the app.
+- Only show real data in stats and charts; never fabricate numbers.
+- Use design tokens (`bg-success`, `text-warning-text`, …), not hardcoded colors.
+
+**Workflow**
+- Show a visual mockup first (no website changes). Implement only what the user picks.
+- When asked for options, show several and discuss them one at a time.
+- Mockups and screenshots use fictional data only — never expose real applications.
+
+**Tables**
+- Must fit full-screen width: no horizontal scroll, fixed column widths (`table-fixed`), long text wraps instead of widening columns.
+- Header stays visible (sticky); no nested scroll box inside the page.
+- Narrow screens: hide secondary columns instead of scrolling sideways; keep their info as a small meta line under the name.
+- Controls must line up across rows — give variable-length content (e.g. dot counts) a fixed width.
+
+**Specifics**
+- Applied column shows the actual date, not relative time.
+- Status colors: applied = info, OA = primary, interview = warning, offer = success, rejected = danger.
+- Rejected is shown apart from the forward pipeline.
+- Every icon-only button needs a hover tooltip with a short description.
+
+**Verify**
+- Check changes in the logged-in local browser at wide, narrow (390px), and dark mode before reporting done.

@@ -26,7 +26,7 @@ import { ExportDialog } from "./ExportDialog";
 import type { SaveStatus } from "./editor-types";
 
 const STATUS_LABEL: Record<SaveStatus, string> = {
-  idle: "All changes saved",
+  idle: "Saved",
   unsaved: "Unsaved changes",
   saving: "Saving…",
   saved: "Saved",
@@ -60,20 +60,36 @@ function StatusPill({ status }: { status: SaveStatus }) {
       role="status"
       aria-live="polite"
     >
-      <Icon className={`h-3.5 w-3.5 ${status === "saving" || status === "retrying" ? "animate-spin" : ""}`} />
+      <Icon
+        className={`h-3.5 w-3.5 ${status === "saving" || status === "retrying" ? "animate-spin" : ""}`}
+      />
       {STATUS_LABEL[status]}
     </span>
   );
 }
 
 export function EditorTopBar({ userId }: { userId: string }) {
-  const { draft, saveStatus, canUndo, canRedo, undo, redo, conflict, reconcile, lastError, retryLast, createVersion } =
-    useEditor();
+  const {
+    draft,
+    saveStatus,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+    conflict,
+    reconcile,
+    lastError,
+    retryLast,
+    createVersion,
+  } = useEditor();
   const [metadataOpen, setMetadataOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [checkpointBusy, setCheckpointBusy] = useState(false);
-  const [checkpointMessage, setCheckpointMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [checkpointMessage, setCheckpointMessage] = useState<{
+    ok: boolean;
+    text: string;
+  } | null>(null);
 
   const handleCheckpoint = async () => {
     if (checkpointBusy) return; // a double click must not mint two versions
@@ -82,7 +98,10 @@ export function EditorTopBar({ userId }: { userId: string }) {
     const result = await createVersion("manual");
     setCheckpointMessage(
       result.ok
-        ? { ok: true, text: `Checkpoint saved as version ${result.versionNumber}.` }
+        ? {
+            ok: true,
+            text: `Checkpoint saved as version ${result.versionNumber}.`,
+          }
         : { ok: false, text: result.message },
     );
     setCheckpointBusy(false);
@@ -91,7 +110,10 @@ export function EditorTopBar({ userId }: { userId: string }) {
   // A checkpoint records what is on the server, so it is only meaningful once
   // everything is actually there.
   const checkpointBlocked =
-    conflict || saveStatus === "unsaved" || saveStatus === "saving" || saveStatus === "failed";
+    conflict ||
+    saveStatus === "unsaved" ||
+    saveStatus === "saving" ||
+    saveStatus === "failed";
 
   return (
     <div className="flex flex-col border-b border-border print:hidden ">
@@ -124,7 +146,9 @@ export function EditorTopBar({ userId }: { userId: string }) {
             </div>
             <p className="truncate text-xs text-muted-foreground">
               {draft.resume.target_company || draft.resume.target_role
-                ? [draft.resume.target_company, draft.resume.target_role].filter(Boolean).join(" · ")
+                ? [draft.resume.target_company, draft.resume.target_role]
+                    .filter(Boolean)
+                    .join(" · ")
                 : "No target company or role set"}
             </p>
           </div>
@@ -133,7 +157,12 @@ export function EditorTopBar({ userId }: { userId: string }) {
         <div className="flex flex-wrap items-center gap-2">
           <StatusPill status={saveStatus} />
           {saveStatus === "failed" && !conflict && (
-            <Button variant="outline" size="sm" onClick={retryLast} className="h-7 gap-1 text-xs">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={retryLast}
+              className="h-7 gap-1 text-xs"
+            >
               <RefreshCw className="h-3 w-3" /> Retry
             </Button>
           )}
@@ -167,20 +196,48 @@ export function EditorTopBar({ userId }: { userId: string }) {
             </span>
           </Tooltip>
           <div className="mx-1 h-5 w-px bg-muted" />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => void handleCheckpoint()}
-            disabled={checkpointBusy || checkpointBlocked}
-            className="h-8 gap-1.5 text-xs"
-            title={checkpointBlocked ? "Save your changes first — a checkpoint records the saved resume." : undefined}
+          <Tooltip
+            label={
+              checkpointBlocked
+                ? "Save your changes first — a checkpoint records the saved resume."
+                : "Save checkpoint"
+            }
           >
-            <BookmarkCheck className="h-3.5 w-3.5" /> Save checkpoint
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setHistoryOpen(true)} className="h-8 gap-1.5 text-xs">
-            <History className="h-3.5 w-3.5" /> Version history
-          </Button>
-          <Button size="sm" onClick={() => setExportOpen(true)} className="h-8 gap-1.5 text-xs">
+            <span className="inline-flex">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleCheckpoint()}
+                disabled={checkpointBusy || checkpointBlocked}
+                aria-label="Save checkpoint"
+                className="h-8 w-8 p-0"
+              >
+                {checkpointBusy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <BookmarkCheck className="h-4 w-4" />
+                )}
+              </Button>
+            </span>
+          </Tooltip>
+          <Tooltip label="Version history">
+            <span className="inline-flex">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setHistoryOpen(true)}
+                aria-label="Version history"
+                className="h-8 w-8 p-0"
+              >
+                <History className="h-4 w-4" />
+              </Button>
+            </span>
+          </Tooltip>
+          <Button
+            size="sm"
+            onClick={() => setExportOpen(true)}
+            className="h-8 gap-1.5 text-xs"
+          >
             <Printer className="h-3.5 w-3.5" /> Export PDF
           </Button>
         </div>
@@ -197,7 +254,11 @@ export function EditorTopBar({ userId }: { userId: string }) {
           }`}
         >
           <span>{checkpointMessage.text}</span>
-          <button type="button" onClick={() => setCheckpointMessage(null)} className="rounded underline underline-offset-2">
+          <button
+            type="button"
+            onClick={() => setCheckpointMessage(null)}
+            className="rounded underline underline-offset-2"
+          >
             Dismiss
           </button>
         </div>
@@ -208,26 +269,51 @@ export function EditorTopBar({ userId }: { userId: string }) {
           <span className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>
-              This resume was changed in another tab or window, so further saves were stopped rather than overwrite the
-              newer version. Your text is still on screen — copy anything you need, then reload to continue from the
-              latest saved resume.
+              This resume was changed in another tab or window, so further saves
+              were stopped rather than overwrite the newer version. Your text is
+              still on screen — copy anything you need, then reload to continue
+              from the latest saved resume.
             </span>
           </span>
-          <Button variant="outline" size="sm" onClick={reconcile} className="h-7 shrink-0 text-xs">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={reconcile}
+            className="h-7 shrink-0 text-xs"
+          >
             Reload latest
           </Button>
         </div>
       )}
 
       {lastError && saveStatus === "failed" && !conflict && (
-        <div role="alert" className="bg-danger-bg px-4 py-1.5 text-xs text-danger-text">
+        <div
+          role="alert"
+          className="bg-danger-bg px-4 py-1.5 text-xs text-danger-text"
+        >
           {lastError} Retrying is safe — it re-sends only this one change.
         </div>
       )}
 
-      {metadataOpen && <ResumeMetadataDialog open={metadataOpen} onOpenChange={setMetadataOpen} />}
-      {historyOpen && <VersionHistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} />}
-      {exportOpen && <ExportDialog open={exportOpen} onOpenChange={setExportOpen} userId={userId} />}
+      {metadataOpen && (
+        <ResumeMetadataDialog
+          open={metadataOpen}
+          onOpenChange={setMetadataOpen}
+        />
+      )}
+      {historyOpen && (
+        <VersionHistoryDialog
+          open={historyOpen}
+          onOpenChange={setHistoryOpen}
+        />
+      )}
+      {exportOpen && (
+        <ExportDialog
+          open={exportOpen}
+          onOpenChange={setExportOpen}
+          userId={userId}
+        />
+      )}
     </div>
   );
 }

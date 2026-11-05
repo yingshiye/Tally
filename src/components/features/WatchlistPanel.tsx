@@ -12,13 +12,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatAgo } from "@/lib/format/relative";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Tables } from "@/types/supabase";
 import { AddWatchlistModal } from "./AddWatchlistModal";
 
 type WatchlistItem = Tables<"user_watchlist">;
 
-export function WatchlistPanel({ items, userId }: { items: WatchlistItem[]; userId: string }) {
+export function WatchlistPanel({
+  items,
+  userId,
+}: {
+  items: WatchlistItem[];
+  userId: string;
+}) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -33,9 +40,12 @@ export function WatchlistPanel({ items, userId }: { items: WatchlistItem[]; user
           <span className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
             <Eye className="size-5" aria-hidden="true" />
           </span>
-          <p className="mt-1 text-sm font-medium text-foreground">No sites watched yet</p>
+          <p className="mt-1 text-sm font-medium text-foreground">
+            No sites watched yet
+          </p>
           <p className="max-w-sm text-sm text-muted-foreground">
-            Add a company careers page and you&apos;ll see a dot here when new roles open up.
+            Add a company careers page and you&apos;ll see a dot here when new
+            roles open up.
           </p>
         </Card>
       ) : (
@@ -47,6 +57,14 @@ export function WatchlistPanel({ items, userId }: { items: WatchlistItem[]; user
       )}
     </div>
   );
+}
+
+function hostnameOf(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
 }
 
 function WatchlistRow({ item }: { item: WatchlistItem }) {
@@ -99,31 +117,44 @@ function WatchlistRow({ item }: { item: WatchlistItem }) {
   return (
     <>
       <Card className="flex-row items-center justify-between gap-4 px-4">
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <p className="truncate text-sm font-medium text-foreground">
-            {item.company}
-          </p>
-          <a
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="truncate text-xs text-muted-foreground hover:underline "
-          >
-            {item.url}
-          </a>
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-semibold text-muted-foreground">
+            {item.company.slice(0, 2).toUpperCase()}
+          </div>
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <p className="truncate text-sm font-medium text-foreground">
+              {item.company}
+            </p>
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={item.url}
+              className="truncate text-xs text-muted-foreground hover:underline"
+            >
+              {hostnameOf(item.url)}
+            </a>
+          </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <span
-              className={`h-2 w-2 rounded-full ${
-                item.has_changes ? "bg-warning" : "bg-border"
-              }`}
-            />
-            <span className="text-xs text-muted-foreground">
-              {item.has_changes ? "Changes detected" : "No changes"}
+          {item.has_changes ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-warning-bg px-2.5 py-1 text-xs font-medium text-warning-text">
+              <span
+                className="size-1.5 rounded-full bg-warning"
+                aria-hidden="true"
+              />
+              New roles · {formatAgo(new Date(item.updated_at))}
             </span>
-          </div>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span
+                className="size-1.5 rounded-full bg-border"
+                aria-hidden="true"
+              />
+              No changes
+            </span>
+          )}
 
           <div className="flex flex-col items-end gap-1">
             <Button
@@ -135,9 +166,7 @@ function WatchlistRow({ item }: { item: WatchlistItem }) {
               {markingAsSeen ? "Marking…" : "Mark as seen"}
             </Button>
             {seenError && (
-              <p className="text-xs text-danger-text">
-                {seenError}
-              </p>
+              <p className="text-xs text-danger-text">{seenError}</p>
             )}
           </div>
 
@@ -173,15 +202,11 @@ function WatchlistRow({ item }: { item: WatchlistItem }) {
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
             This will stop monitoring{" "}
-            <span className="font-medium text-foreground">
-              {item.company}
-            </span>{" "}
+            <span className="font-medium text-foreground">{item.company}</span>{" "}
             for new job openings.
           </p>
           {deleteError && (
-            <p className="text-sm text-danger-text">
-              {deleteError}
-            </p>
+            <p className="text-sm text-danger-text">{deleteError}</p>
           )}
           <div className="flex justify-end gap-2 pt-1">
             <Button

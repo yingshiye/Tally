@@ -77,8 +77,12 @@ const stack = [
 
 const btnPrimary =
   "inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground transition-[filter,transform] duration-150 hover:brightness-110 active:scale-[0.98]";
+// Frosted-glass surface. Marketing page only — the app itself stays flat.
+// Keep the fill fairly opaque (/60) so text contrast holds over the blobs.
+const glass =
+  "border border-white/70 bg-card/60 backdrop-blur-xl shadow-[0_8px_32px_oklch(0.3_0.05_260/0.10)] dark:border-white/10";
 const btnOutline =
-  "inline-flex h-10 items-center justify-center gap-2 rounded-md border border-input bg-card px-5 text-sm font-medium text-foreground transition-[background-color,transform] duration-150 hover:bg-muted active:scale-[0.98]";
+  "inline-flex h-10 items-center justify-center gap-2 rounded-md border border-white/70 bg-card/60 px-5 text-sm font-medium text-foreground backdrop-blur-xl transition-[background-color,transform] duration-150 hover:bg-card/80 active:scale-[0.98] dark:border-white/10";
 
 function Strong({ children }: { children: React.ReactNode }) {
   return <strong className="font-semibold text-foreground">{children}</strong>;
@@ -86,9 +90,19 @@ function Strong({ children }: { children: React.ReactNode }) {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
-      <header className="sticky top-0 z-30 border-b border-border bg-background">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+    <div className="relative isolate min-h-screen overflow-x-clip bg-background text-foreground antialiased [--muted-foreground:oklch(0.44_0.012_250)]">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      >
+        <div className="absolute -left-32 top-8 size-[460px] rounded-full bg-blue-400/50 blur-3xl" />
+        <div className="absolute -right-24 top-1/3 size-[480px] rounded-full bg-violet-400/40 blur-3xl" />
+        <div className="absolute -bottom-32 left-1/3 size-[460px] rounded-full bg-teal-300/50 blur-3xl" />
+      </div>
+      <header
+        className={`sticky top-4 z-30 mx-auto mt-4 w-[calc(100%-2rem)] max-w-5xl rounded-full ${glass}`}
+      >
+        <div className="flex h-12 items-center justify-between px-5">
           <Link href="/" className="flex items-center gap-2.5 rounded-md">
             <span className="flex size-7 items-center justify-center rounded-md bg-foreground text-xs font-semibold text-background">
               IT
@@ -135,7 +149,9 @@ export default function LandingPage() {
 
       <main>
         <section className="mx-auto flex max-w-4xl flex-col items-center px-6 pt-20 pb-14 text-center">
-          <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
+          <div
+            className={`mb-6 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs text-muted-foreground ${glass}`}
+          >
             <Sparkles className="size-3.5" aria-hidden="true" />A solo
             full-stack project, live in production
           </div>
@@ -172,20 +188,22 @@ export default function LandingPage() {
         </section>
 
         <section className="mx-auto max-w-5xl px-6">
-          <div className="overflow-hidden rounded-xl border border-border bg-card shadow-[0_4px_8px_oklch(0.208_0.007_250/0.05),0_12px_32px_oklch(0.208_0.007_250/0.1)]">
-            <div className="flex items-center gap-1.5 border-b border-border bg-muted px-4 py-3">
-              <span className="size-2.5 rounded-full bg-border" />
-              <span className="size-2.5 rounded-full bg-border" />
-              <span className="size-2.5 rounded-full bg-border" />
+          <div className={`rounded-2xl p-2 sm:p-3 ${glass}`}>
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
+              <div className="flex items-center gap-1.5 border-b border-border bg-muted px-4 py-3">
+                <span className="size-2.5 rounded-full bg-border" />
+                <span className="size-2.5 rounded-full bg-border" />
+                <span className="size-2.5 rounded-full bg-border" />
+              </div>
+              <Image
+                src="/marketing/dashboard.png"
+                alt="Internship Tracker dashboard"
+                width={1440}
+                height={760}
+                className="w-full"
+                priority
+              />
             </div>
-            <Image
-              src="/marketing/dashboard.png"
-              alt="Internship Tracker dashboard"
-              width={1440}
-              height={760}
-              className="w-full"
-              priority
-            />
           </div>
         </section>
 
@@ -210,7 +228,9 @@ export default function LandingPage() {
                 }`}
               >
                 <div className="lg:w-2/5">
-                  <div className="mb-4 inline-flex size-10 items-center justify-center rounded-lg bg-muted text-foreground">
+                  <div
+                    className={`mb-4 inline-flex size-10 items-center justify-center rounded-lg text-foreground ${glass}`}
+                  >
                     <feature.icon className="size-5" aria-hidden="true" />
                   </div>
                   <h3 className="text-2xl font-semibold tracking-tight">
@@ -221,14 +241,16 @@ export default function LandingPage() {
                   </p>
                 </div>
                 <div className="lg:w-3/5">
-                  <div className="overflow-hidden rounded-xl border border-border bg-card shadow-[0_2px_4px_oklch(0.208_0.007_250/0.05),0_4px_12px_oklch(0.208_0.007_250/0.08)]">
-                    <Image
-                      src={feature.image}
-                      alt={feature.imageAlt}
-                      width={feature.width}
-                      height={feature.height}
-                      className="w-full"
-                    />
+                  <div className={`rounded-2xl p-2 ${glass}`}>
+                    <div className="overflow-hidden rounded-xl border border-border bg-card">
+                      <Image
+                        src={feature.image}
+                        alt={feature.imageAlt}
+                        width={feature.width}
+                        height={feature.height}
+                        className="w-full"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -247,10 +269,7 @@ export default function LandingPage() {
           </div>
           <ol className="grid gap-4 sm:grid-cols-3">
             {steps.map((step, index) => (
-              <li
-                key={step.title}
-                className="rounded-xl border border-border bg-card p-6"
-              >
+              <li key={step.title} className={`rounded-2xl p-6 ${glass}`}>
                 <div className="mb-4 font-mono text-sm font-medium text-primary">
                   {String(index + 1).padStart(2, "0")}
                 </div>
@@ -264,7 +283,7 @@ export default function LandingPage() {
         </section>
 
         <section className="mx-auto max-w-5xl px-6 py-12">
-          <div className="rounded-xl border border-border bg-card px-6 py-10 sm:px-10">
+          <div className={`rounded-2xl px-6 py-10 sm:px-10 ${glass}`}>
             <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
               <div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -282,7 +301,7 @@ export default function LandingPage() {
                 {stack.map((tech) => (
                   <span
                     key={tech}
-                    className="rounded-full bg-muted px-3 py-1 font-mono text-xs text-muted-foreground"
+                    className="rounded-full bg-background/70 px-3 py-1 font-mono text-xs text-muted-foreground"
                   >
                     {tech}
                   </span>
@@ -293,7 +312,9 @@ export default function LandingPage() {
         </section>
 
         <section className="mx-auto max-w-3xl px-6 py-24 text-center">
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
+          <div
+            className={`mb-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs text-muted-foreground ${glass}`}
+          >
             <ListChecks className="size-3.5" aria-hidden="true" />
             Free to use, no credit card
           </div>
@@ -315,7 +336,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-border">
+      <footer className="border-t border-border/60">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row">
           <span>Built by Yingshi Ye</span>
           <a

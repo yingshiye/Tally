@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { StatsBar } from "@/components/features/StatsBar";
+import { WeeklyActivity } from "@/components/features/WeeklyActivity";
 import { ApplicationList } from "@/components/features/ApplicationList";
 import { UpcomingPanel } from "@/components/features/UpcomingPanel";
 import { AddApplicationModal } from "@/components/features/AddApplicationModal";
@@ -44,7 +45,12 @@ export default async function DashboardPage() {
         <AddApplicationModal userId={user.id} />
       </div>
       <StatsBar applications={apps} />
-      <ApplicationList applications={apps} events={allEvents} userId={user.id} />
+      <WeeklyActivity applications={apps} />
+      <ApplicationList
+        applications={apps}
+        events={allEvents}
+        userId={user.id}
+      />
       {upcomingEvents.length > 0 && (
         <UpcomingPanel
           events={upcomingEvents}

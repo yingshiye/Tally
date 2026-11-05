@@ -19,6 +19,20 @@ type InitialProgress = {
   notes: string | null;
 };
 
+const RING_R = 54;
+const RING_C = 2 * Math.PI * RING_R;
+
+const DIFFICULTIES: { level: NeetCodeDifficulty; fill: string }[] = [
+  { level: "Easy", fill: "bg-success" },
+  { level: "Medium", fill: "bg-warning" },
+  { level: "Hard", fill: "bg-danger" },
+];
+
+const DIFFICULTY_TOTALS = NEETCODE_150.flatMap((c) => c.problems).reduce(
+  (acc, p) => ({ ...acc, [p.difficulty]: acc[p.difficulty] + 1 }),
+  { Easy: 0, Medium: 0, Hard: 0 } as Record<NeetCodeDifficulty, number>,
+);
+
 const DIFFICULTY_STYLES: Record<NeetCodeDifficulty, string> = {
   Easy: "border-success/40 bg-success/5 text-success-text",
   Medium: "border-warning/40 bg-warning/5 text-warning-text",
@@ -51,6 +65,15 @@ export function NeetCode150Tracker({
     () => Object.values(progress).filter((status) => status === "review").length,
     [progress],
   );
+  const solvedByDifficulty = useMemo(() => {
+    const counts: Record<NeetCodeDifficulty, number> = { Easy: 0, Medium: 0, Hard: 0 };
+    for (const category of NEETCODE_150) {
+      for (const problem of category.problems) {
+        if (progress[problem.id] === "completed") counts[problem.difficulty] += 1;
+      }
+    }
+    return counts;
+  }, [progress]);
   const completionPercent = Math.round((completedCount / NEETCODE_TOTAL) * 100);
 
   async function setStatus(problemId: string, nextStatus: ProblemStatus) {
@@ -109,26 +132,52 @@ export function NeetCode150Tracker({
 
   return (
     <div className="flex flex-col gap-6">
-      <section aria-label="NeetCode 150 progress" className="overflow-hidden rounded-lg border border-border bg-card">
-        <div className="grid grid-cols-3">
-          <div className="border-r border-border p-4 sm:p-5">
-            <p className="text-xs font-medium text-muted-foreground">Solved</p>
-            <p className="mt-2 text-xl font-semibold tracking-tight">
-              {completedCount}<span className="text-sm font-normal text-muted-foreground"> / {NEETCODE_TOTAL}</span>
-            </p>
+      <section aria-label="NeetCode 150 progress" className="rounded-lg border border-border bg-card p-4 sm:p-5">
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div className="relative size-28 shrink-0">
+            <svg viewBox="0 0 128 128" className="size-full -rotate-90" role="img" aria-label={`${completedCount} of ${NEETCODE_TOTAL} problems solved, ${completionPercent} percent`}>
+              <circle cx="64" cy="64" r={RING_R} fill="none" strokeWidth="12" className="stroke-muted" />
+              <circle
+                cx="64"
+                cy="64"
+                r={RING_R}
+                fill="none"
+                strokeWidth="12"
+                strokeLinecap="round"
+                className="stroke-primary transition-[stroke-dasharray] duration-[400ms]"
+                strokeDasharray={`${(completionPercent / 100) * RING_C} ${RING_C}`}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <p className="text-2xl font-semibold leading-none tabular-nums tracking-tight">
+                {completedCount}<span className="text-sm font-normal text-muted-foreground">/{NEETCODE_TOTAL}</span>
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">solved</p>
+            </div>
           </div>
-          <div className="border-r border-border p-4 sm:p-5">
-            <p className="text-xs font-medium text-muted-foreground">Flagged for review</p>
-            <p className="mt-2 text-xl font-semibold tracking-tight">{reviewCount}</p>
+
+          <div className="flex min-w-[220px] flex-1 flex-col gap-2.5">
+            {DIFFICULTIES.map(({ level, fill }) => {
+              const total = DIFFICULTY_TOTALS[level];
+              const done = solvedByDifficulty[level];
+              return (
+                <div key={level} className="flex items-center gap-3 text-sm">
+                  <span className="w-16 text-muted-foreground">{level}</span>
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                    <div className={cn("h-full rounded-full transition-[width] duration-[400ms]", fill)} style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
+                  </div>
+                  <span className="w-12 text-right text-xs tabular-nums text-muted-foreground">{done}/{total}</span>
+                </div>
+              );
+            })}
           </div>
-          <div className="p-4 sm:p-5">
-            <p className="text-xs font-medium text-muted-foreground">Complete</p>
-            <p className="mt-2 text-xl font-semibold tracking-tight">{completionPercent}%</p>
-          </div>
-        </div>
-        <div className="border-t border-border px-4 py-3 sm:px-5">
-          <div className="h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-            <div className="h-full bg-primary transition-[width]" style={{ width: `${completionPercent}%` }} />
+
+          <div className="flex items-center gap-2 border-border sm:border-l sm:pl-6">
+            <Flag className={cn("size-4", reviewCount > 0 ? "text-warning-text" : "text-muted-foreground")} aria-hidden="true" />
+            <div>
+              <p className="text-xl font-semibold leading-none tabular-nums">{reviewCount}</p>
+              <p className="mt-1 text-xs text-muted-foreground">to review</p>
+            </div>
           </div>
         </div>
       </section>
@@ -170,7 +219,12 @@ export function NeetCode150Tracker({
             >
               <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
                 <h3 id={`category-${category.name}`} className="text-sm font-semibold">{category.name}</h3>
-                <span className="text-xs text-muted-foreground">{categoryCompleted}/{category.problems.length}</span>
+                <div className="flex items-center gap-3">
+                  <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                    <div className="h-full rounded-full bg-primary transition-[width] duration-[400ms]" style={{ width: `${(categoryCompleted / category.problems.length) * 100}%` }} />
+                  </div>
+                  <span className="w-8 text-right text-xs tabular-nums text-muted-foreground">{categoryCompleted}/{category.problems.length}</span>
+                </div>
               </div>
               <ul className="divide-y divide-border">
                 {visibleProblems.map((problem) => {
