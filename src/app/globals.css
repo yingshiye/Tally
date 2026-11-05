@@ -241,8 +241,34 @@
   animation: skeleton-pulse 1.6s ease-in-out infinite;
 }
 
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+.grow-x {
+  transform-origin: left;
+  animation: grow-x 900ms var(--ease-out) both;
+  animation-delay: calc(var(--row-i, 0) * 80ms + 300ms);
+}
+
+.grow-y {
+  transform-origin: bottom;
+  animation: grow-y 600ms var(--ease-out) both;
+  animation-delay: calc(var(--row-i, 0) * 50ms + 500ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .row-in,
+  .grow-x,
+  .grow-y,
   .skeleton {
     animation: none;
   }

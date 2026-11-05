@@ -1,52 +1,11 @@
 import Link from "next/link";
-import Image from "next/image";
-import {
-  ArrowRight,
-  Code2,
-  LayoutDashboard,
-  Eye,
-  FileText,
-  Sparkles,
-  ListChecks,
-  Wand2,
-} from "lucide-react";
+import { ArrowRight, Code2, Sparkles, ListChecks, Wand2 } from "lucide-react";
+import { HeroDemo } from "@/components/marketing/HeroDemo";
+import { PipelineDemo } from "@/components/marketing/PipelineDemo";
+import { FeatureShowcase } from "@/components/marketing/FeatureShowcase";
+import { Reveal } from "@/components/marketing/Reveal";
 
 const REPO_URL = "https://github.com/yingshiye/InternshipTracker";
-
-const features = [
-  {
-    icon: LayoutDashboard,
-    title: "One pipeline, not ten spreadsheets",
-    description:
-      "Every application lives in one board — status, next step, and upcoming events at a glance, filterable by stage from wishlist to offer.",
-    image: "/marketing/dashboard.png",
-    imageAlt:
-      "Internship Tracker dashboard showing a list of applications and pipeline stats",
-    width: 1440,
-    height: 760,
-  },
-  {
-    icon: FileText,
-    title: "A resume editor built for tailoring",
-    description:
-      "Keep a library of bullets and entries, then assemble a fitted, one-page resume per role in minutes — with live fit checks and instant PDF export.",
-    image: "/marketing/resume-editor.png",
-    imageAlt:
-      "Resume editor with a module library, live preview, and formatting settings",
-    width: 1440,
-    height: 900,
-  },
-  {
-    icon: Eye,
-    title: "Know the moment a posting changes",
-    description:
-      "Add a careers page to your watchlist and a background job checks it on a schedule, flagging changes before the role disappears.",
-    image: "/marketing/watchlist.png",
-    imageAlt: "Watchlist page tracking a company careers page for changes",
-    width: 1440,
-    height: 420,
-  },
-];
 
 const steps = [
   {
@@ -156,9 +115,9 @@ export default function LandingPage() {
             full-stack project, live in production
           </div>
           <h1 className="text-4xl font-semibold leading-[1.1] tracking-tight text-balance sm:text-5xl md:text-6xl">
-            Every internship application,
+            17 tabs. 3 spreadsheets.
             <br className="hidden sm:block" />{" "}
-            <span className="text-primary">tracked in one place.</span>
+            <span className="text-primary">One place for your search.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-muted-foreground text-balance">
             I built Internship Tracker to run my own internship search — a{" "}
@@ -187,28 +146,27 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-5xl px-6">
-          <div className={`rounded-2xl p-2 sm:p-3 ${glass}`}>
-            <div className="overflow-hidden rounded-xl border border-border bg-card">
-              <div className="flex items-center gap-1.5 border-b border-border bg-muted px-4 py-3">
-                <span className="size-2.5 rounded-full bg-border" />
-                <span className="size-2.5 rounded-full bg-border" />
-                <span className="size-2.5 rounded-full bg-border" />
-              </div>
-              <Image
-                src="/marketing/dashboard.png"
-                alt="Internship Tracker dashboard"
-                width={1440}
-                height={760}
-                className="w-full"
-                priority
-              />
-            </div>
-          </div>
+        <section className="px-6">
+          <HeroDemo />
+        </section>
+
+        <section className="mx-auto max-w-3xl px-6 pt-24 pb-4">
+          <Reveal className="mx-auto mb-10 max-w-2xl text-center">
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              Try it: move an application forward
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Click through the pipeline and watch the funnel update — it works
+              the same way in the app.
+            </p>
+          </Reveal>
+          <Reveal delay={80}>
+            <PipelineDemo />
+          </Reveal>
         </section>
 
         <section id="features" className="mx-auto max-w-6xl px-6 py-28">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
+          <Reveal className="mx-auto mb-14 max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
               Everything the search actually needs
             </h2>
@@ -217,59 +175,29 @@ export default function LandingPage() {
               <Strong>apply, tailor, and follow up</Strong> — instead of a
               generic to-do list wearing a job-search skin.
             </p>
-          </div>
-
-          <div className="space-y-24">
-            {features.map((feature, index) => (
-              <div
-                key={feature.title}
-                className={`flex flex-col gap-10 lg:flex-row lg:items-center ${
-                  index % 2 === 1 ? "lg:flex-row-reverse" : ""
-                }`}
-              >
-                <div className="lg:w-2/5">
-                  <div
-                    className={`mb-4 inline-flex size-10 items-center justify-center rounded-lg text-foreground ${glass}`}
-                  >
-                    <feature.icon className="size-5" aria-hidden="true" />
-                  </div>
-                  <h3 className="text-2xl font-semibold tracking-tight">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-3 text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </div>
-                <div className="lg:w-3/5">
-                  <div className={`rounded-2xl p-2 ${glass}`}>
-                    <div className="overflow-hidden rounded-xl border border-border bg-card">
-                      <Image
-                        src={feature.image}
-                        alt={feature.imageAlt}
-                        width={feature.width}
-                        height={feature.height}
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          </Reveal>
+          <Reveal delay={80}>
+            <FeatureShowcase />
+          </Reveal>
         </section>
 
         <section id="how-it-works" className="mx-auto max-w-5xl px-6 py-24">
-          <div className="mx-auto mb-14 max-w-2xl text-center">
+          <Reveal className="mx-auto mb-14 max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
               How it works
             </h2>
             <p className="mt-4 text-muted-foreground">
               Three steps, repeated for every role you apply to.
             </p>
-          </div>
+          </Reveal>
           <ol className="grid gap-4 sm:grid-cols-3">
             {steps.map((step, index) => (
-              <li key={step.title} className={`rounded-2xl p-6 ${glass}`}>
+              <Reveal
+                as="li"
+                key={step.title}
+                delay={index * 80}
+                className={`rounded-2xl p-6 ${glass}`}
+              >
                 <div className="mb-4 font-mono text-sm font-medium text-primary">
                   {String(index + 1).padStart(2, "0")}
                 </div>
@@ -277,7 +205,7 @@ export default function LandingPage() {
                 <p className="mt-2 text-sm text-muted-foreground">
                   {step.description}
                 </p>
-              </li>
+              </Reveal>
             ))}
           </ol>
         </section>
