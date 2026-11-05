@@ -29,13 +29,13 @@ function formatDate(dateStr: string): string {
   });
 }
 
-const STATUS_CLASSES: Record<Application["status"], string> = {
-  wishlist: "bg-chart-1/15 text-chart-1 dark:bg-chart-1/20",
-  applied: "bg-chart-2/15 text-chart-2 dark:bg-chart-2/20",
-  oa: "bg-chart-3/15 text-chart-3 dark:bg-chart-3/20",
-  interview: "bg-chart-4/15 text-chart-4 dark:bg-chart-4/20",
-  offer: "bg-chart-5/15 text-chart-5 dark:bg-chart-5/20",
-  rejected: "bg-muted text-muted-foreground",
+const STATUS_STYLES: Record<Application["status"], { badge: string; dot: string }> = {
+  wishlist: { badge: "bg-muted text-muted-foreground", dot: "bg-subtle-foreground" },
+  applied: { badge: "bg-info-bg text-info-text", dot: "bg-info" },
+  oa: { badge: "bg-accent text-accent-foreground", dot: "bg-primary" },
+  interview: { badge: "bg-warning-bg text-warning-text", dot: "bg-warning" },
+  offer: { badge: "bg-success-bg text-success-text", dot: "bg-success" },
+  rejected: { badge: "bg-muted text-muted-foreground", dot: "bg-danger" },
 };
 
 const STATUS_LABELS: Record<Application["status"], string> = {
@@ -52,7 +52,9 @@ export function ApplicationRow({
   events,
   nextEvent,
   userId,
+  index = 0,
 }: {
+  index?: number;
   application: Application;
   events: Event[];
   nextEvent: Event | null;
@@ -94,7 +96,10 @@ export function ApplicationRow({
 
   return (
     <>
-      <tr className="group transition-colors hover:bg-muted/45">
+      <tr
+        className="row-in group transition-colors hover:bg-muted/60"
+        style={{ "--row-i": index } as React.CSSProperties}
+      >
         {/* Company / Role */}
         <td className="px-4 py-3">
           <div className="flex min-w-0 items-center gap-3">
@@ -111,8 +116,12 @@ export function ApplicationRow({
         {/* Status */}
         <td className="px-3 py-3">
           <span
-            className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${STATUS_CLASSES[application.status]}`}
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[application.status].badge}`}
           >
+            <span
+              aria-hidden="true"
+              className={`size-1.5 rounded-full ${STATUS_STYLES[application.status].dot}`}
+            />
             {STATUS_LABELS[application.status]}
           </span>
         </td>
@@ -136,7 +145,7 @@ export function ApplicationRow({
               <p
                 className={`mt-0.5 text-xs ${
                   isEventSoon
-                    ? "text-chart-4"
+                    ? "font-medium text-warning-text"
                     : "text-muted-foreground"
                 }`}
               >
@@ -144,7 +153,7 @@ export function ApplicationRow({
               </p>
             </div>
           ) : (
-            <p className="text-[13px] text-muted-foreground">No next step</p>
+            <p className="whitespace-nowrap text-[13px] text-muted-foreground">No next step</p>
           )}
         </td>
 
@@ -156,7 +165,7 @@ export function ApplicationRow({
                 type="button"
                 onClick={() => setEditOpen(true)}
                 aria-label={`Edit ${application.company} application`}
-                className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="rounded-md p-1.5 text-muted-foreground transition-[color,background-color,transform] duration-150 active:scale-90 hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <Pencil className="h-3.5 w-3.5" />
               </button>
@@ -176,9 +185,9 @@ export function ApplicationRow({
                     ? `Change attached resume for ${application.company}`
                     : `Attach submitted resume to ${application.company}`
                 }
-                className={`rounded-md p-1.5 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`rounded-md p-1.5 transition-[color,background-color,transform] duration-150 active:scale-90 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   application.submitted_resume_version_id
-                    ? "text-chart-5 hover:text-chart-5"
+                    ? "text-success-text hover:text-success-text"
                     : "text-muted-foreground hover:text-accent-foreground"
                 }`}
               >
@@ -194,7 +203,7 @@ export function ApplicationRow({
                 type="button"
                 onClick={() => setAddEventOpen(true)}
                 aria-label={`Add event for ${application.company}`}
-                className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="rounded-md p-1.5 text-muted-foreground transition-[color,background-color,transform] duration-150 active:scale-90 hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <CalendarPlus className="h-3.5 w-3.5" />
               </button>
@@ -207,7 +216,7 @@ export function ApplicationRow({
                   setDeleteOpen(true);
                 }}
                 aria-label={`Delete ${application.company} application permanently`}
-                className="rounded-md p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
+                className="rounded-md p-1.5 text-muted-foreground transition-[color,background-color,transform] duration-150 active:scale-90 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -265,7 +274,7 @@ export function ApplicationRow({
             and all its events. This cannot be undone.
           </p>
           {deleteError && (
-            <p className="text-sm text-red-600 dark:text-red-400">
+            <p className="text-sm text-danger-text">
               {deleteError}
             </p>
           )}

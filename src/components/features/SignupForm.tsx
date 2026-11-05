@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { UserPlus, Mail, Lock } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -65,56 +64,47 @@ export function SignupForm() {
   }
 
   return (
-    <Card>
-      <CardContent className="flex flex-col items-center gap-3 pt-6 pb-2 text-center">
-        <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-          <UserPlus className="size-5" />
-        </div>
-        <div>
-          <h1 className="text-lg font-semibold tracking-tight text-foreground">
-            Create an account
-          </h1>
-          <p className="mt-1 max-w-2xs text-sm text-muted-foreground">
-            Start tracking your internship applications, for free.
-          </p>
-        </div>
+    <Card className="gap-6">
+      <CardContent className="flex flex-col gap-1.5">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          Create your account
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Start tracking your internship applications, for free.
+        </p>
       </CardContent>
       <CardContent className="flex flex-col gap-4">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="email">Email</Label>
-            <div className="relative">
-              <Mail className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                className="pl-8"
-              />
-            </div>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="password">Password</Label>
-            <div className="relative">
-              <Lock className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="password"
-                type="password"
-                placeholder="Create a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="new-password"
-                minLength={6}
-                className="pl-8"
-              />
-            </div>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="new-password"
+              minLength={6}
+            />
           </div>
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <p role="alert" className="text-sm text-danger-text">
+              {error}
+            </p>
+          )}
           <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Creating account…" : "Create account"}
           </Button>
@@ -137,9 +127,12 @@ export function SignupForm() {
           {googleLoading ? "Redirecting…" : "Continue with Google"}
         </Button>
 
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="text-foreground underline">
+          <Link
+            href="/login"
+            className="font-medium text-foreground underline underline-offset-4"
+          >
             Sign in
           </Link>
         </p>

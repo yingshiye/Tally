@@ -118,7 +118,7 @@ export function ResumeBlocksPanel({
 
       {filteredBlocks.length === 0 ? (
         <Card className="items-center justify-center py-12 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             {blocks.length === 0
               ? "No blocks yet. Add your first experience, education, or skills block."
               : "No blocks match this filter."}
@@ -168,10 +168,10 @@ function LibraryBlockCard({ block, bullets, resumes, sections }: { block: Librar
           <div className="flex min-w-0 flex-col gap-1">
             <div className="flex items-center gap-2">
               <Badge variant="outline">{LAYOUT_KIND_LABELS[block.layout_kind]}</Badge>
-              <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{block.name}</p>
+              <p className="truncate text-sm font-medium text-foreground">{block.name}</p>
             </div>
             {subtitleParts.length > 0 && (
-              <p className="truncate text-xs text-gray-500 dark:text-gray-400">{subtitleParts.join(" · ")}</p>
+              <p className="truncate text-xs text-muted-foreground">{subtitleParts.join(" · ")}</p>
             )}
           </div>
           <div className="flex shrink-0 items-center gap-1">
@@ -179,7 +179,7 @@ function LibraryBlockCard({ block, bullets, resumes, sections }: { block: Librar
               type="button"
               onClick={() => setAddOpen(true)}
               title="Add to resume"
-              className="flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950"
+              className="flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-primary hover:bg-accent"
             >
               <FilePlus2 className="h-3.5 w-3.5" /> Add to resume
             </button>
@@ -187,7 +187,7 @@ function LibraryBlockCard({ block, bullets, resumes, sections }: { block: Librar
               type="button"
               onClick={() => setExpanded((v) => !v)}
               title={expanded ? "Hide bullets" : "Show bullets"}
-              className="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900"
+              className="flex items-center gap-1 rounded px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
             >
               {bullets.length} {bullets.length === 1 ? "bullet" : "bullets"}
               {expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
@@ -197,7 +197,7 @@ function LibraryBlockCard({ block, bullets, resumes, sections }: { block: Librar
                 type="button"
                 onClick={() => setEditOpen(true)}
                 aria-label={`Edit ${block.name}`}
-                className="rounded p-1.5 text-gray-400 hover:bg-gray-50 hover:text-gray-700 dark:hover:bg-gray-900 dark:hover:text-gray-200"
+                className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <Pencil className="h-3.5 w-3.5" />
               </button>
@@ -207,7 +207,7 @@ function LibraryBlockCard({ block, bullets, resumes, sections }: { block: Librar
                 type="button"
                 onClick={() => setDeleteOpen(true)}
                 aria-label={`Delete ${block.name}`}
-                className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400"
+                className="rounded p-1.5 text-muted-foreground hover:bg-danger-bg hover:text-danger-text"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -232,12 +232,12 @@ function LibraryBlockCard({ block, bullets, resumes, sections }: { block: Librar
           <DialogHeader>
             <DialogTitle className="text-base font-medium">Delete block?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            This removes <span className="font-medium text-gray-900 dark:text-gray-100">{block.name}</span>{" "}
+          <p className="text-sm text-muted-foreground">
+            This removes <span className="font-medium text-foreground">{block.name}</span>{" "}
             and its bullets from your library. Resumes that already copied content from it keep their own
             copy — nothing on an existing resume changes.
           </p>
-          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+          {error && <p className="text-sm text-danger-text">{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
             <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={busy}>
               Cancel
@@ -306,23 +306,23 @@ function AddBlockToResumeDialog({ block, bullets, resumes, sections, open, onOpe
           <DialogDescription>Choose a resume and a compatible section. If needed, a section is created automatically.</DialogDescription>
         </DialogHeader>
         {resumes.length === 0 ? (
-          <p className="text-sm text-gray-500">Create a resume first, then add this block.</p>
+          <p className="text-sm text-muted-foreground">Create a resume first, then add this block.</p>
         ) : (
           <div className="flex flex-col gap-3 pt-2">
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Resume</span>
-              <select value={resumeId} onChange={(event) => { setResumeId(event.target.value); setSectionId(""); }} className="h-9 rounded-md border border-gray-200 bg-transparent px-2 dark:border-gray-700 dark:bg-gray-900">
+              <span className="text-muted-foreground">Resume</span>
+              <select value={resumeId} onChange={(event) => { setResumeId(event.target.value); setSectionId(""); }} className="h-9 rounded-md border border-border bg-transparent px-2">
                 {resumes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Section</span>
-              <select value={sectionId} onChange={(event) => setSectionId(event.target.value)} className="h-9 rounded-md border border-gray-200 bg-transparent px-2 dark:border-gray-700 dark:bg-gray-900">
+              <span className="text-muted-foreground">Section</span>
+              <select value={sectionId} onChange={(event) => setSectionId(event.target.value)} className="h-9 rounded-md border border-border bg-transparent px-2">
                 <option value="">Create “{block.default_section_title || LAYOUT_KIND_LABELS[block.layout_kind]}”</option>
                 {compatible.map((section) => <option key={section.id} value={section.id}>{section.title}</option>)}
               </select>
             </label>
-            {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+            {error && <p className="text-sm text-danger-text">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
               <Button onClick={() => void handleAdd()} disabled={busy}>{busy ? "Adding…" : "Add and open resume"}</Button>
@@ -382,9 +382,9 @@ function BulletsEditor({ blockId, bullets }: { blockId: string; bullets: Library
   }
 
   return (
-    <div className="flex flex-col gap-2 border-t border-gray-100 pt-3 dark:border-gray-800">
+    <div className="flex flex-col gap-2 border-t border-border pt-3 ">
       {bullets.length === 0 ? (
-        <p className="text-xs text-gray-400 dark:text-gray-500">No bullets yet.</p>
+        <p className="text-xs text-muted-foreground">No bullets yet.</p>
       ) : (
         <ul className="flex flex-col gap-1.5">
           {bullets.map((bullet, index) => (
@@ -421,7 +421,7 @@ function BulletsEditor({ blockId, bullets }: { blockId: string; bullets: Library
           </span>
         </Tooltip>
       </form>
-      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-xs text-danger-text">{error}</p>}
     </div>
   );
 }
@@ -462,9 +462,9 @@ function BulletRow({
 
   if (editing) {
     return (
-      <li className="flex flex-col gap-1.5 rounded-md bg-gray-50 p-2 dark:bg-gray-900">
+      <li className="flex flex-col gap-1.5 rounded-md bg-muted p-2 ">
         <Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={2} />
-        {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
+        {error && <p className="text-xs text-danger-text">{error}</p>}
         <div className="flex justify-end gap-2">
           <Button
             type="button"
@@ -487,8 +487,8 @@ function BulletRow({
   }
 
   return (
-    <li className="flex items-start justify-between gap-2 rounded-md px-1 py-1 hover:bg-gray-50 dark:hover:bg-gray-900">
-      <span className="text-sm text-gray-700 dark:text-gray-300">{bullet.content}</span>
+    <li className="flex items-start justify-between gap-2 rounded-md px-1 py-1 hover:bg-muted">
+      <span className="text-sm text-foreground">{bullet.content}</span>
       <div className="flex shrink-0 items-center gap-0.5">
         <BulletIconButton label="Move bullet up" onClick={onMoveUp} disabled={!onMoveUp || busy}>
           <ChevronUp className="h-3.5 w-3.5" />
@@ -528,8 +528,8 @@ function BulletIconButton({
       aria-label={label}
       className={
         destructive
-          ? "rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-30 dark:hover:bg-red-950 dark:hover:text-red-400"
-          : "rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+          ? "rounded p-1 text-muted-foreground hover:bg-danger-bg hover:text-danger-text disabled:opacity-30"
+          : "rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30"
       }
     >
       {children}

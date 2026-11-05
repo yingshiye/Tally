@@ -20,9 +20,9 @@ type InitialProgress = {
 };
 
 const DIFFICULTY_STYLES: Record<NeetCodeDifficulty, string> = {
-  Easy: "border-emerald-500/40 bg-emerald-500/5 text-emerald-600",
-  Medium: "border-amber-500/40 bg-amber-500/5 text-amber-600",
-  Hard: "border-red-500/40 bg-red-500/5 text-red-600",
+  Easy: "border-success/40 bg-success/5 text-success-text",
+  Medium: "border-warning/40 bg-warning/5 text-warning-text",
+  Hard: "border-danger/40 bg-danger/5 text-danger-text",
 };
 
 export function NeetCode150Tracker({
@@ -232,7 +232,7 @@ export function NeetCode150Tracker({
                           title={isReview ? "Unflag for review" : "Flag for review"}
                           className={cn(
                             "shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-60",
-                            isReview && "text-amber-500",
+                            isReview && "text-warning",
                           )}
                         >
                           <Flag className="size-3.5" fill={isReview ? "currentColor" : "none"} />
@@ -246,7 +246,7 @@ export function NeetCode150Tracker({
                           title={isNoteOpen ? "Hide note" : hasNote ? "Edit note" : "Add note"}
                           className={cn(
                             "shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground",
-                            (hasNote || isNoteOpen) && "text-sky-500",
+                            (hasNote || isNoteOpen) && "text-info",
                           )}
                         >
                           <StickyNote className="size-3.5" fill={hasNote ? "currentColor" : "none"} />

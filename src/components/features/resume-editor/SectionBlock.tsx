@@ -58,7 +58,7 @@ export function SectionBlock({
   return (
     <SortableItem id={section.id} handleLabel={`Reorder section ${section.title}`}>
       <section>
-        <div className="group flex items-center gap-1 border-b border-gray-300" style={{ marginBottom: 4 }}>
+        <div className="group flex items-center gap-1 border-b border-border" style={{ marginBottom: 4 }}>
           <input
             value={section.title}
             onChange={(e) => void renameSection(section.id, e.target.value)}
@@ -87,7 +87,7 @@ export function SectionBlock({
           </div>
         </div>
 
-        {deleteError && <p className="mb-1 text-xs text-red-600">{deleteError}</p>}
+        {deleteError && <p className="mb-1 text-xs text-danger-text">{deleteError}</p>}
 
         <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingLeft: "0.15in" }}>
           <SortableList
@@ -105,10 +105,10 @@ export function SectionBlock({
         </div>
 
         <div className="mt-1.5 flex items-center gap-2 print:hidden">
-          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-gray-500" onClick={() => void addCustomEntry(section.id)}>
+          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-muted-foreground" onClick={() => void addCustomEntry(section.id)}>
             <Plus className="h-3 w-3" /> Add entry
           </Button>
-          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-gray-500" onClick={() => setCopyOpen(true)}>
+          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-muted-foreground" onClick={() => setCopyOpen(true)}>
             <BookOpen className="h-3 w-3" /> From library
           </Button>
         </div>
@@ -136,7 +136,7 @@ function IconBtn({
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 dark:hover:bg-gray-800"
+      className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 "
     >
       {children}
     </button>

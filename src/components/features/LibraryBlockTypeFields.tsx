@@ -55,7 +55,7 @@ export function LibraryBlockTypeFields({ idPrefix, layoutKind, details, setDetai
       <div className="flex flex-col gap-3">
         <div>
           <Label>Skill categories</Label>
-          <p className="mt-1 text-xs text-gray-500">Examples: Languages, Frameworks, Tools</p>
+          <p className="mt-1 text-xs text-muted-foreground">Examples: Languages, Frameworks, Tools</p>
         </div>
         {details.skillCategories.map((category, categoryIndex) => (
           <div key={categoryIndex} className="flex flex-col gap-2 rounded-md border p-3">
@@ -197,7 +197,7 @@ export function LibraryBlockTypeFields({ idPrefix, layoutKind, details, setDetai
             onChange={(value) => setDetail("endDate", value)}
             disabled={details.isPresent}
           />
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
             <input
               type="checkbox"
               checked={details.isPresent}

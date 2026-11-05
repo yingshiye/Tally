@@ -99,16 +99,16 @@ export function CopyBlockMenu({ section, onClose }: { section: ResumeSection; on
             <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto">
               <div className="flex flex-col gap-1">
                 {compatibleBlocks.length === 0 && (
-                  <p className="py-2 text-sm text-gray-500">No {section.layout_kind} blocks in your library yet.</p>
+                  <p className="py-2 text-sm text-muted-foreground">No {section.layout_kind} blocks in your library yet.</p>
                 )}
                 {compatibleBlocks.map((b) => (
                   <div
                     key={b.id}
-                    className={`flex items-center gap-1 rounded-md border pl-3 pr-1 ${selectedBlockId === b.id ? "border-gray-900 dark:border-gray-100" : "border-gray-200 dark:border-gray-700"}`}
+                    className={`flex items-center gap-1 rounded-md border pl-3 pr-1 ${selectedBlockId === b.id ? "border-foreground" : "border-border"}`}
                   >
                     <button type="button" onClick={() => selectBlock(b.id)} className="flex-1 py-2 text-left text-sm">
                       <span className="font-medium">{b.name}</span>
-                      {b.title && <span className="text-gray-500"> — {b.title}</span>}
+                      {b.title && <span className="text-muted-foreground"> — {b.title}</span>}
                     </button>
                     <Tooltip label="Edit library block">
                       <Button
@@ -138,8 +138,8 @@ export function CopyBlockMenu({ section, onClose }: { section: ResumeSection; on
                 </Button>
               </div>
               {selectedBlockId && blockBullets.length > 0 && (
-                <div className="rounded-md border border-gray-100 p-2 dark:border-gray-800">
-                  <p className="mb-1 text-xs font-medium text-gray-500">Bullets to include</p>
+                <div className="rounded-md border border-border p-2 ">
+                  <p className="mb-1 text-xs font-medium text-muted-foreground">Bullets to include</p>
                   {blockBullets.map((lb) => (
                     <label key={lb.id} className="flex items-start gap-2 py-0.5 text-sm">
                       <input

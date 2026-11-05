@@ -77,12 +77,12 @@ export function CustomLinksDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3 pt-2">
-          {links.length === 0 && <p className="text-sm text-gray-500">No custom links yet.</p>}
+          {links.length === 0 && <p className="text-sm text-muted-foreground">No custom links yet.</p>}
           <ul className="flex flex-col gap-2">
             {links.map((link, i) => (
               <li key={i} className="flex items-end gap-2">
                 <div className="flex flex-1 flex-col gap-1">
-                  <Label htmlFor={`link-label-${i}`} className="text-xs text-gray-500">
+                  <Label htmlFor={`link-label-${i}`} className="text-xs text-muted-foreground">
                     Label
                   </Label>
                   <Input
@@ -93,7 +93,7 @@ export function CustomLinksDialog({
                   />
                 </div>
                 <div className="flex flex-[2] flex-col gap-1">
-                  <Label htmlFor={`link-url-${i}`} className="text-xs text-gray-500">
+                  <Label htmlFor={`link-url-${i}`} className="text-xs text-muted-foreground">
                     URL
                   </Label>
                   <Input
@@ -129,7 +129,7 @@ export function CustomLinksDialog({
             <Plus className="h-3.5 w-3.5" /> Add link
           </Button>
           {error && (
-            <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+            <p role="alert" className="text-sm text-danger-text">
               {error}
             </p>
           )}
@@ -164,7 +164,7 @@ function IconBtn({
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-offset-1 dark:hover:bg-gray-800"
+      className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-offset-1 "
     >
       {children}
     </button>

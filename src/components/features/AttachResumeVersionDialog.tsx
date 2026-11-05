@@ -120,14 +120,14 @@ export function AttachResumeVersionDialog({
 
         <div className="flex flex-col gap-4 pt-1">
           {error && (
-            <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+            <p role="alert" className="rounded-md bg-danger-bg px-3 py-2 text-sm text-danger-text">
               {error}
             </p>
           )}
 
           {application.submitted_resume_version_id && (
-            <div className="flex items-center justify-between gap-2 rounded-md bg-gray-50 px-3 py-2 text-sm dark:bg-gray-800">
-              <span className="text-gray-700 dark:text-gray-300">A submitted version is currently attached.</span>
+            <div className="flex items-center justify-between gap-2 rounded-md bg-muted px-3 py-2 text-sm">
+              <span className="text-foreground">A submitted version is currently attached.</span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -141,15 +141,15 @@ export function AttachResumeVersionDialog({
           )}
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="attach-resume" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label htmlFor="attach-resume" className="text-sm font-medium text-foreground">
               Resume
             </label>
             {resumes === null ? (
-              <p className="flex items-center gap-2 text-sm text-gray-500">
+              <p className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading resumes…
               </p>
             ) : resumes.length === 0 ? (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 You have no resumes yet. <Link href="/resumes" className="underline">Create one first</Link>.
               </p>
             ) : (
@@ -157,7 +157,7 @@ export function AttachResumeVersionDialog({
                 id="attach-resume"
                 value={selectedResumeId ?? ""}
                 onChange={(e) => setSelectedResumeId(e.target.value || null)}
-                className="rounded-md border border-gray-200 px-2 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900"
+                className="rounded-md border border-border px-2 py-1.5 text-sm"
               >
                 <option value="">Choose a resume…</option>
                 {resumes.map((r) => (
@@ -170,11 +170,11 @@ export function AttachResumeVersionDialog({
           </div>
 
           {selectedResume && mismatches.length > 0 && (
-            <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm dark:border-amber-900 dark:bg-amber-950">
-              <p className="flex items-center gap-1.5 font-medium text-amber-900 dark:text-amber-200">
+            <div className="rounded-md border border-warning/40 bg-warning-bg px-3 py-2 text-sm">
+              <p className="flex items-center gap-1.5 font-medium text-warning-text">
                 <AlertTriangle className="h-4 w-4" /> This resume is aimed somewhere else
               </p>
-              <ul className="mt-1 text-xs text-amber-800 dark:text-amber-300">
+              <ul className="mt-1 text-xs text-warning-text">
                 {mismatches.map((m) => (
                   <li key={m.field}>
                     {m.field === "company" ? "Company" : "Role"}: application says{" "}
@@ -183,7 +183,7 @@ export function AttachResumeVersionDialog({
                   </li>
                 ))}
               </ul>
-              <p className="mt-1 text-xs text-amber-800 dark:text-amber-300">
+              <p className="mt-1 text-xs text-warning-text">
                 Neither side is changed automatically — continue if that is intentional, or edit the resume&apos;s
                 target first.
               </p>
@@ -199,13 +199,13 @@ export function AttachResumeVersionDialog({
               </Button>
 
               <div>
-                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">
+                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Or attach an existing submitted version
                 </p>
                 {versions === null ? (
-                  <p className="text-sm text-gray-500">Loading versions…</p>
+                  <p className="text-sm text-muted-foreground">Loading versions…</p>
                 ) : versions.length === 0 ? (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     This resume has no submitted versions yet. Use the editor flow above to create one.
                   </p>
                 ) : (
@@ -213,11 +213,11 @@ export function AttachResumeVersionDialog({
                     {versions.map((v) => (
                       <li
                         key={v.id}
-                        className="flex items-center justify-between gap-2 rounded-md border border-gray-100 px-2.5 py-1.5 text-sm dark:border-gray-800"
+                        className="flex items-center justify-between gap-2 rounded-md border border-border px-2.5 py-1.5 text-sm"
                       >
                         <span>
                           Version {v.version_number}
-                          <span className="ml-2 text-xs text-gray-500">
+                          <span className="ml-2 text-xs text-muted-foreground">
                             {new Date(v.created_at).toLocaleString()}
                           </span>
                         </span>
@@ -239,9 +239,9 @@ export function AttachResumeVersionDialog({
           )}
 
           {pendingReplace !== null && (
-            <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-900 dark:bg-amber-950">
-              <p className="font-medium text-amber-900 dark:text-amber-200">Replace the attached version?</p>
-              <p className="mt-1 text-xs text-amber-800 dark:text-amber-300">
+            <div className="rounded-md border border-warning/40 bg-warning-bg p-3 text-sm">
+              <p className="font-medium text-warning-text">Replace the attached version?</p>
+              <p className="mt-1 text-xs text-warning-text">
                 This application already points at a submitted version. Replacing it changes the record of what was
                 sent. The old version is not deleted.
               </p>

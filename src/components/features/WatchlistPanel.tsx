@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -22,17 +22,20 @@ export function WatchlistPanel({ items, userId }: { items: WatchlistItem[]; user
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-          Watchlist
-        </h2>
+        <p className="text-sm tabular-nums text-muted-foreground">
+          {items.length} {items.length === 1 ? "site" : "sites"}
+        </p>
         <AddWatchlistModal userId={userId} />
       </div>
 
       {items.length === 0 ? (
-        <Card className="items-center justify-center py-12 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            No sites added yet. Add a company careers page to get notified
-            when roles open up.
+        <Card className="items-center justify-center py-16 text-center">
+          <span className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <Eye className="size-5" aria-hidden="true" />
+          </span>
+          <p className="mt-1 text-sm font-medium text-foreground">No sites watched yet</p>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            Add a company careers page and you&apos;ll see a dot here when new roles open up.
           </p>
         </Card>
       ) : (
@@ -97,14 +100,14 @@ function WatchlistRow({ item }: { item: WatchlistItem }) {
     <>
       <Card className="flex-row items-center justify-between gap-4 px-4">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+          <p className="truncate text-sm font-medium text-foreground">
             {item.company}
           </p>
           <a
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="truncate text-xs text-gray-500 hover:underline dark:text-gray-400"
+            className="truncate text-xs text-muted-foreground hover:underline "
           >
             {item.url}
           </a>
@@ -114,10 +117,10 @@ function WatchlistRow({ item }: { item: WatchlistItem }) {
           <div className="flex items-center gap-1.5">
             <span
               className={`h-2 w-2 rounded-full ${
-                item.has_changes ? "bg-amber-400" : "bg-gray-300 dark:bg-gray-600"
+                item.has_changes ? "bg-warning" : "bg-border"
               }`}
             />
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-xs text-muted-foreground">
               {item.has_changes ? "Changes detected" : "No changes"}
             </span>
           </div>
@@ -132,7 +135,7 @@ function WatchlistRow({ item }: { item: WatchlistItem }) {
               {markingAsSeen ? "Marking…" : "Mark as seen"}
             </Button>
             {seenError && (
-              <p className="text-xs text-red-600 dark:text-red-400">
+              <p className="text-xs text-danger-text">
                 {seenError}
               </p>
             )}
@@ -146,7 +149,7 @@ function WatchlistRow({ item }: { item: WatchlistItem }) {
                 setDeleteError(null);
                 setDeleteOpen(true);
               }}
-              className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400"
+              className="rounded p-1 text-muted-foreground hover:bg-danger-bg hover:text-danger-text"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -168,15 +171,15 @@ function WatchlistRow({ item }: { item: WatchlistItem }) {
               Remove from watchlist?
             </DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             This will stop monitoring{" "}
-            <span className="font-medium text-gray-900 dark:text-gray-100">
+            <span className="font-medium text-foreground">
               {item.company}
             </span>{" "}
             for new job openings.
           </p>
           {deleteError && (
-            <p className="text-sm text-red-600 dark:text-red-400">
+            <p className="text-sm text-danger-text">
               {deleteError}
             </p>
           )}

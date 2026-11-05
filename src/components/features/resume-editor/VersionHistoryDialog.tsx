@@ -20,9 +20,9 @@ const TYPE_LABEL: Record<VersionType, string> = {
 };
 
 const TYPE_CLASS: Record<VersionType, string> = {
-  manual: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
-  exported: "bg-blue-50 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
-  submitted: "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-300",
+  manual: "bg-muted text-foreground",
+  exported: "bg-info-bg text-info-text",
+  submitted: "bg-success-bg text-success-text",
 };
 
 type Mode =
@@ -145,7 +145,7 @@ export function VersionHistoryDialog({
           <Button variant="ghost" size="sm" className="self-start" onClick={() => setMode({ kind: "list" })}>
             ← Back to all versions
           </Button>
-          {snap ? <SnapshotViewer snapshot={snap} /> : <p className="text-sm text-gray-500">Loading…</p>}
+          {snap ? <SnapshotViewer snapshot={snap} /> : <p className="text-sm text-muted-foreground">Loading…</p>}
         </div>
       );
     }
@@ -166,23 +166,23 @@ export function VersionHistoryDialog({
           {left && right ? (
             <VersionCompareView diff={compareSnapshots(left, right)} beforeLabel={leftLabel} afterLabel={rightLabel} />
           ) : (
-            <p className="text-sm text-gray-500">Loading…</p>
+            <p className="text-sm text-muted-foreground">Loading…</p>
           )}
         </div>
       );
     }
 
-    if (loadError) return <p className="text-sm text-red-600">{loadError}</p>;
+    if (loadError) return <p className="text-sm text-danger-text">{loadError}</p>;
     if (versions === null) {
       return (
-        <p className="flex items-center gap-2 text-sm text-gray-500">
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" /> Loading versions…
         </p>
       );
     }
     if (versions.length === 0) {
       return (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           No versions yet. Use “Save checkpoint” to record the resume as it stands, or export it — an exported version
           is created automatically before printing.
         </p>
@@ -191,12 +191,12 @@ export function VersionHistoryDialog({
 
     return (
       <div className="flex flex-col gap-3">
-        <label className="flex items-center gap-2 text-xs text-gray-500">
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
           Compare against
           <select
             value={compareLeft}
             onChange={(e) => setCompareLeft(e.target.value)}
-            className="rounded-md border border-gray-200 px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-900"
+            className="rounded-md border border-border px-2 py-1 text-xs"
           >
             <option value="draft">Current draft</option>
             {versions.map((v) => (
@@ -211,16 +211,16 @@ export function VersionHistoryDialog({
           {versions.map((v) => {
             const snap = snapshots[v.id];
             return (
-              <li key={v.id} className="rounded-md border border-gray-100 p-2.5 dark:border-gray-800">
+              <li key={v.id} className="rounded-md border border-border p-2.5 ">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <p className="flex items-center gap-2 text-sm font-medium text-foreground">
                       Version {v.version_number}
                       <span className={`rounded-full px-1.5 py-0.5 text-[11px] font-medium ${TYPE_CLASS[v.version_type]}`}>
                         {TYPE_LABEL[v.version_type]}
                       </span>
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {new Date(v.created_at).toLocaleString()}
                       {snap?.draftRevision !== null && snap?.draftRevision !== undefined
                         ? ` · draft revision ${snap.draftRevision}`
@@ -260,7 +260,7 @@ export function VersionHistoryDialog({
           })}
         </ul>
 
-        <p className="flex items-center gap-1.5 text-xs text-gray-400">
+        <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Lock className="h-3 w-3" /> Versions are immutable — they cannot be edited or deleted, including by a
           restore.
         </p>
@@ -281,7 +281,7 @@ export function VersionHistoryDialog({
 
         <div className="min-h-0 min-w-0 flex-1 overflow-y-auto px-5 pb-5">
           {snapshotError && (
-            <p role="alert" className="mt-4 text-sm text-red-600">
+            <p role="alert" className="mt-4 text-sm text-danger-text">
               {snapshotError}
             </p>
           )}
@@ -294,11 +294,11 @@ export function VersionHistoryDialog({
           <div className="pt-4">{body()}</div>
 
           {restoreTarget && (
-            <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-900 dark:bg-amber-950">
-            <p className="font-medium text-amber-900 dark:text-amber-200">
+            <div className="mt-4 rounded-md border border-warning/40 bg-warning-bg p-3 text-sm">
+            <p className="font-medium text-warning-text">
               Restore the draft from version {restoreTarget.version_number}?
             </p>
-            <p className="mt-1 text-xs text-amber-800 dark:text-amber-300">
+            <p className="mt-1 text-xs text-warning-text">
               This replaces the current header, sections, entries, bullets, style settings and target length with that
               version&apos;s content, in one atomic operation. Every saved version is kept. Entries restored this way
               are no longer linked to a library block.

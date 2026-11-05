@@ -9,9 +9,9 @@ import { runResumeCheck, sortFindings, type Finding, type Severity } from "@/lib
 import { buildPreflightEntries } from "./preflight-input";
 
 const SEVERITY_META: Record<Severity, { icon: typeof AlertCircle; label: string; className: string }> = {
-  error: { icon: AlertCircle, label: "Errors", className: "text-red-600" },
-  warning: { icon: AlertTriangle, label: "Warnings", className: "text-amber-600" },
-  suggestion: { icon: Lightbulb, label: "Suggestions", className: "text-blue-600" },
+  error: { icon: AlertCircle, label: "Errors", className: "text-danger-text" },
+  warning: { icon: AlertTriangle, label: "Warnings", className: "text-warning-text" },
+  suggestion: { icon: Lightbulb, label: "Suggestions", className: "text-info-text" },
 };
 
 export function ResumeCheckPanel({ userId }: { userId: string }) {
@@ -85,21 +85,21 @@ export function ResumeCheckPanel({ userId }: { userId: string }) {
         <button
           type="button"
           onClick={() => setCollapsed((c) => !c)}
-          className="flex items-center gap-1 text-sm font-medium text-gray-900 dark:text-gray-100"
+          className="flex items-center gap-1 text-sm font-medium text-foreground"
         >
           {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
           Resume Check
-          {collapsed && visible.length > 0 && <span className="text-xs font-normal text-gray-400">({visible.length})</span>}
+          {collapsed && visible.length > 0 && <span className="text-xs font-normal text-muted-foreground">({visible.length})</span>}
         </button>
         {dismissedCount > 0 && (
-          <button type="button" onClick={restoreAll} className="text-xs text-gray-400 hover:text-gray-600">
+          <button type="button" onClick={restoreAll} className="text-xs text-muted-foreground hover:text-muted-foreground">
             Restore {dismissedCount} dismissed
           </button>
         )}
       </div>
 
       {!collapsed && (visible.length === 0 ? (
-        <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950 dark:text-green-300">No issues found.</p>
+        <p className="rounded-md bg-success-bg px-3 py-2 text-sm text-success-text">No issues found.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {(["error", "warning", "suggestion"] as Severity[]).map((sev) => {
@@ -114,20 +114,20 @@ export function ResumeCheckPanel({ userId }: { userId: string }) {
                 </p>
                 <ul className="flex flex-col gap-1">
                   {items.map((f) => (
-                    <li key={f.id} className="rounded-md border border-gray-100 px-2.5 py-2 text-sm dark:border-gray-800">
-                      <p className="text-gray-700 dark:text-gray-300">{f.message}</p>
+                    <li key={f.id} className="rounded-md border border-border px-2.5 py-2 text-sm">
+                      <p className="text-foreground">{f.message}</p>
                       <div className="mt-1 flex items-center gap-2">
                         {f.targetId && (
-                          <button type="button" onClick={() => locate(f)} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700">
+                          <button type="button" onClick={() => locate(f)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
                             <MapPin className="h-3 w-3" /> Locate
                           </button>
                         )}
                         {f.canFix && (
-                          <button type="button" onClick={() => fix(f)} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700">
+                          <button type="button" onClick={() => fix(f)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
                             <Wand2 className="h-3 w-3" /> Fix
                           </button>
                         )}
-                        <button type="button" onClick={() => dismiss(f.fingerprint)} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700">
+                        <button type="button" onClick={() => dismiss(f.fingerprint)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
                           <X className="h-3 w-3" /> Dismiss
                         </button>
                       </div>

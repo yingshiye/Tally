@@ -36,7 +36,7 @@ export function ForgotPasswordForm() {
     return (
       <Card>
         <CardContent className="pt-6">
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             If an account exists for {email}, we&apos;ve sent a link to reset
             your password.
           </p>
@@ -68,11 +68,11 @@ export function ForgotPasswordForm() {
             {loading ? "Sending…" : "Send reset link"}
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-muted-foreground">
+        <p className="mt-4 text-sm text-muted-foreground">
           Remembered your password?{" "}
           <Link
             href="/login"
-            className="text-foreground underline"
+            className="font-medium text-foreground underline underline-offset-4"
           >
             Sign in
           </Link>

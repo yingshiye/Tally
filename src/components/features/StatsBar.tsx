@@ -29,7 +29,11 @@ export function StatsBar({ applications }: { applications: Application[] }) {
         >
           <CardContent className="p-4 sm:p-5">
             <p className="text-xs font-medium text-muted-foreground sm:text-sm">{stat.label}</p>
-            <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+            <p
+              className={`mt-2 text-2xl font-semibold tabular-nums tracking-tight ${
+                stat.value === 0 ? "text-muted-foreground" : "text-foreground"
+              }`}
+            >
               {stat.value}
             </p>
           </CardContent>

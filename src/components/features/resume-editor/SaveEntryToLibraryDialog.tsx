@@ -49,7 +49,7 @@ export function SaveEntryToLibraryDialog({ entryId, open, onOpenChange }: {
             <Label htmlFor={`save-entry-section-${entryId}`}>Default section</Label>
             <Input id={`save-entry-section-${entryId}`} value={defaultSectionTitle} onChange={(event) => setDefaultSectionTitle(event.target.value)} placeholder="Experience" />
           </div>
-          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+          {error && <p className="text-sm text-danger-text">{error}</p>}
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>Cancel</Button>
             <Button onClick={() => void save()} disabled={busy || !name.trim() || !defaultSectionTitle.trim()}>

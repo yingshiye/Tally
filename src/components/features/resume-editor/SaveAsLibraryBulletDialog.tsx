@@ -75,21 +75,21 @@ export function SaveAsLibraryBulletDialog({ bulletId, open, onOpenChange }: { bu
           <DialogDescription>Add this bullet’s current text to a library block so you can reuse it. This bullet will be linked to the new library bullet.</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
-          <p className="rounded bg-gray-50 px-3 py-2 text-sm dark:bg-gray-900">{bullet?.content}</p>
+          <p className="rounded bg-muted px-3 py-2 text-sm">{bullet?.content}</p>
 
           {library.blocks.length > 0 && (
-            <div className="flex gap-1 rounded-md bg-gray-100 p-0.5 text-sm dark:bg-gray-800">
+            <div className="flex gap-1 rounded-md bg-muted p-0.5 text-sm">
               <button
                 type="button"
                 onClick={() => setMode("existing")}
-                className={`flex-1 rounded px-2 py-1 ${mode === "existing" ? "bg-white shadow-sm dark:bg-gray-900" : "text-gray-500"}`}
+                className={`flex-1 rounded px-2 py-1 ${mode === "existing" ? "bg-card shadow-sm " : "text-muted-foreground"}`}
               >
                 Existing block
               </button>
               <button
                 type="button"
                 onClick={() => setMode("new")}
-                className={`flex-1 rounded px-2 py-1 ${mode === "new" ? "bg-white shadow-sm dark:bg-gray-900" : "text-gray-500"}`}
+                className={`flex-1 rounded px-2 py-1 ${mode === "new" ? "bg-card shadow-sm " : "text-muted-foreground"}`}
               >
                 New block
               </button>
@@ -98,8 +98,8 @@ export function SaveAsLibraryBulletDialog({ bulletId, open, onOpenChange }: { bu
 
           {mode === "existing" ? (
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-gray-500">Destination block</span>
-              <select value={blockId} onChange={(e) => setBlockId(e.target.value)} className="rounded border border-gray-200 px-2 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900">
+              <span className="text-muted-foreground">Destination block</span>
+              <select value={blockId} onChange={(e) => setBlockId(e.target.value)} className="rounded border border-border px-2 py-1.5 text-sm">
                 {library.blocks.map((b) => (
                   <option key={b.id} value={b.id}>
                     {b.name}
@@ -117,12 +117,12 @@ export function SaveAsLibraryBulletDialog({ bulletId, open, onOpenChange }: { bu
                 value={newBlockName}
                 onChange={(e) => setNewBlockName(e.target.value)}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Creates a new library block from this entry’s details, then saves this bullet into it.
               </p>
             </div>
           )}
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger-text">{error}</p>}
         </div>
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>

@@ -24,9 +24,9 @@ const FONT_TIMEOUT_MS = 5000;
 const PREPARE_TIMEOUT_MS = 8000;
 
 const SEVERITY_META: Record<PreflightSeverity, { icon: typeof AlertCircle; label: string; className: string }> = {
-  blocking: { icon: AlertCircle, label: "Must fix before exporting", className: "text-red-600" },
-  warning: { icon: AlertTriangle, label: "Worth checking", className: "text-amber-600" },
-  info: { icon: Info, label: "For information", className: "text-blue-600" },
+  blocking: { icon: AlertCircle, label: "Must fix before exporting", className: "text-danger-text" },
+  warning: { icon: AlertTriangle, label: "Worth checking", className: "text-warning-text" },
+  info: { icon: Info, label: "For information", className: "text-info-text" },
 };
 
 /**
@@ -255,32 +255,32 @@ export function ExportDialog({
           <div
             role="status"
             aria-live="polite"
-            className="flex items-center gap-2 rounded-md bg-gray-50 px-3 py-2 text-sm dark:bg-gray-800"
+            className="flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-sm"
           >
-            {busy && <Loader2 className="h-4 w-4 animate-spin text-gray-500" />}
-            <span className="text-gray-700 dark:text-gray-300">{EXPORT_STATE_LABEL[ctx.state]}</span>
+            {busy && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+            <span className="text-foreground">{EXPORT_STATE_LABEL[ctx.state]}</span>
             {ctx.versionNumber !== null && (
-              <span className="text-xs text-gray-500">· version {ctx.versionNumber} recorded</span>
+              <span className="text-xs text-muted-foreground">· version {ctx.versionNumber} recorded</span>
             )}
           </div>
 
           {ctx.message && (
-            <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+            <p role="alert" className="rounded-md bg-danger-bg px-3 py-2 text-sm text-danger-text">
               {ctx.message}
             </p>
           )}
 
           {ctx.state === "completed" && (
-            <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800 dark:bg-green-950 dark:text-green-300">
+            <p className="rounded-md bg-success-bg px-3 py-2 text-sm text-success-text">
               The print dialog was opened and version {ctx.versionNumber} was recorded. Whether a file was actually
               saved is up to you and your browser — a web page cannot tell.
             </p>
           )}
 
           <div>
-            <p className="text-xs text-gray-500">Suggested filename</p>
-            <p className="font-mono text-sm text-gray-800 dark:text-gray-200">{suggestedFilename}.pdf</p>
-            <p className="mt-0.5 text-xs text-gray-400">
+            <p className="text-xs text-muted-foreground">Suggested filename</p>
+            <p className="font-mono text-sm text-foreground">{suggestedFilename}.pdf</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
               Your browser fills its save dialog from the page title and controls the final name.
             </p>
           </div>
@@ -300,10 +300,10 @@ export function ExportDialog({
                     {items.map((issue) => (
                       <li
                         key={issue.id}
-                        className="rounded-md border border-gray-100 px-2.5 py-1.5 text-sm dark:border-gray-800"
+                        className="rounded-md border border-border px-2.5 py-1.5 text-sm"
                       >
-                        <p className="text-gray-700 dark:text-gray-300">{issue.message}</p>
-                        {issue.hint && <p className="text-xs text-gray-500">{issue.hint}</p>}
+                        <p className="text-foreground">{issue.message}</p>
+                        {issue.hint && <p className="text-xs text-muted-foreground">{issue.hint}</p>}
                       </li>
                     ))}
                   </ul>

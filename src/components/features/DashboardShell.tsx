@@ -131,7 +131,7 @@ export function DashboardShell({
                   <span
                     aria-label={`${changedCount} watchlist changes`}
                     className={cn(
-                      "ml-auto size-1.5 rounded-full bg-amber-500",
+                      "ml-auto size-1.5 rounded-full bg-warning",
                       collapsed && "md:absolute md:right-2 md:top-2"
                     )}
                   />
@@ -185,12 +185,12 @@ export function DashboardShell({
           type="button"
           aria-label="Close navigation"
           onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 z-40 bg-black/35 backdrop-blur-[1px] md:hidden"
+          className="fixed inset-0 z-40 bg-foreground/40 md:hidden"
         />
       )}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform duration-200 md:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform duration-[250ms] ease-[var(--ease-out)] md:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           collapsed && "md:w-[68px]"
         )}
@@ -198,7 +198,7 @@ export function DashboardShell({
         {sidebar}
       </aside>
       <div className={cn("min-w-0 transition-[padding] duration-200 md:pl-60", collapsed && "md:pl-[68px]")}>
-        <header className="sticky top-0 z-30 flex h-14 items-center border-b border-border bg-background/95 px-4 backdrop-blur md:hidden">
+        <header className="sticky top-0 z-30 flex h-14 items-center border-b border-border bg-background px-4 md:hidden">
           <Tooltip label="Open navigation">
             <button
               type="button"

@@ -33,14 +33,14 @@ export function ResumesPanel({
     <TooltipProvider>
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <div className="flex gap-1 rounded-md border border-gray-200 p-0.5 dark:border-gray-800">
+        <div className="flex gap-1 rounded-md border border-border p-0.5 ">
           <button
             type="button"
             onClick={() => setTab("active")}
             className={`rounded px-3 py-1 text-sm transition-colors ${
               tab === "active"
-                ? "bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900"
-                : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Active
@@ -50,8 +50,8 @@ export function ResumesPanel({
             onClick={() => setTab("archived")}
             className={`rounded px-3 py-1 text-sm transition-colors ${
               tab === "archived"
-                ? "bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900"
-                : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Archived
@@ -62,7 +62,7 @@ export function ResumesPanel({
 
       {resumes.length === 0 ? (
         <Card className="items-center justify-center py-12 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             {tab === "active" ? "No resumes yet. Create one to get started." : "No archived resumes."}
           </p>
         </Card>
@@ -139,8 +139,8 @@ function ResumeRow({ resume }: { resume: Resume }) {
     <>
       <Card className="flex-row items-center justify-between gap-4 px-4">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{resume.name}</p>
-          <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+          <p className="truncate text-sm font-medium text-foreground">{resume.name}</p>
+          <p className="truncate text-xs text-muted-foreground">
             {[resume.target_role, resume.target_company].filter(Boolean).join(" · ") ||
               "No target role or company set"}
           </p>
@@ -150,7 +150,7 @@ function ResumeRow({ resume }: { resume: Resume }) {
             <Link
               href={`/resumes/${resume.id}`}
               aria-label={`Open ${resume.name} editor`}
-              className="rounded p-1.5 text-gray-400 hover:bg-gray-50 hover:text-gray-700 dark:hover:bg-gray-900 dark:hover:text-gray-200"
+              className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <SquarePen className="h-3.5 w-3.5" />
             </Link>
@@ -160,7 +160,7 @@ function ResumeRow({ resume }: { resume: Resume }) {
               type="button"
               aria-label={`Rename ${resume.name}`}
               onClick={() => setRenameOpen(true)}
-              className="rounded p-1.5 text-gray-400 hover:bg-gray-50 hover:text-gray-700 dark:hover:bg-gray-900 dark:hover:text-gray-200"
+              className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
@@ -171,7 +171,7 @@ function ResumeRow({ resume }: { resume: Resume }) {
               aria-label={`Duplicate ${resume.name}`}
               onClick={handleDuplicate}
               disabled={busy}
-              className="rounded p-1.5 text-gray-400 hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 dark:hover:bg-gray-900 dark:hover:text-gray-200"
+              className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"
             >
               <Copy className="h-3.5 w-3.5" />
             </button>
@@ -182,7 +182,7 @@ function ResumeRow({ resume }: { resume: Resume }) {
               aria-label={`${resume.archived_at ? "Unarchive" : "Archive"} ${resume.name}`}
               onClick={handleArchiveToggle}
               disabled={busy}
-              className="rounded p-1.5 text-gray-400 hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 dark:hover:bg-gray-900 dark:hover:text-gray-200"
+              className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"
             >
               {resume.archived_at ? (
                 <ArchiveRestore className="h-3.5 w-3.5" />
@@ -196,7 +196,7 @@ function ResumeRow({ resume }: { resume: Resume }) {
               type="button"
               aria-label={`Delete ${resume.name} permanently`}
               onClick={() => setDeleteOpen(true)}
-              className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400"
+              className="rounded p-1.5 text-muted-foreground hover:bg-danger-bg hover:text-danger-text"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -204,7 +204,7 @@ function ResumeRow({ resume }: { resume: Resume }) {
         </div>
       </Card>
       {error && !deleteOpen && (
-        <p className="px-1 text-xs text-red-600 dark:text-red-400">{error}</p>
+        <p className="px-1 text-xs text-danger-text">{error}</p>
       )}
 
       <RenameResumeModal resume={resume} open={renameOpen} onOpenChange={setRenameOpen} />
@@ -220,12 +220,12 @@ function ResumeRow({ resume }: { resume: Resume }) {
           <DialogHeader>
             <DialogTitle className="text-base font-medium">Permanently delete resume?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             This removes{" "}
-            <span className="font-medium text-gray-900 dark:text-gray-100">{resume.name}</span> and
+            <span className="font-medium text-foreground">{resume.name}</span> and
             all its sections, entries, and bullets. This can&apos;t be undone.
           </p>
-          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+          {error && <p className="text-sm text-danger-text">{error}</p>}
           <div className="flex justify-end gap-2 pt-1">
             <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={busy}>
               Cancel

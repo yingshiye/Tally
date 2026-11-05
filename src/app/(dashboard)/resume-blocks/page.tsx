@@ -32,12 +32,12 @@ export default async function ResumeBlocksPage() {
     .order("sort_order", { ascending: true });
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 p-4 sm:p-6 lg:p-8">
       <div>
-        <h1 className="text-xl font-medium text-gray-900 dark:text-gray-100">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
           Resume blocks
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Your reusable library of experience, education, and skills blocks.
         </p>
       </div>

@@ -73,17 +73,17 @@ export function ResetPasswordForm() {
     return (
       <Card>
         <CardContent className="pt-6">
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             This reset link is invalid or has expired.
           </p>
-          <p className="mt-2 text-center text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground">
             If you opened it on a different device or browser than the one
             you requested it from, try opening it there instead.
           </p>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
+          <p className="mt-4 text-sm text-muted-foreground">
             <Link
               href="/forgot-password"
-              className="text-foreground underline"
+              className="font-medium text-foreground underline underline-offset-4"
             >
               Request a new link
             </Link>
@@ -97,7 +97,7 @@ export function ResetPasswordForm() {
     return (
       <Card>
         <CardContent className="pt-6">
-          <p className="text-center text-sm text-muted-foreground">Verifying link…</p>
+          <p className="text-sm text-muted-foreground">Verifying link…</p>
         </CardContent>
       </Card>
     );

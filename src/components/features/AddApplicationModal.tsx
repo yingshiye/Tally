@@ -225,7 +225,7 @@ export function AddApplicationModal({ userId }: { userId: string }) {
               {extracting ? "Extracting…" : "Autofill from description"}
             </Button>
             {extractError && (
-              <p className="text-sm text-red-600 dark:text-red-400">{extractError}</p>
+              <p className="text-sm text-danger-text">{extractError}</p>
             )}
             <p className="text-xs text-muted-foreground">
               Fills in company, role, and location below — review before saving.
@@ -314,7 +314,7 @@ export function AddApplicationModal({ userId }: { userId: string }) {
             />
           </div>
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-danger-text">{error}</p>
           )}
           <div className="flex justify-end gap-2 pt-1">
             <Button

@@ -30,8 +30,8 @@ export function SettingsPanel() {
   const { style, setStyle, draft, setTargetLength } = useEditor();
 
   return (
-    <div className="border-b border-gray-100 p-3 dark:border-gray-800">
-      <h2 className="mb-2 text-sm font-medium text-gray-900 dark:text-gray-100">Settings</h2>
+    <div className="border-b border-border p-3 ">
+      <h2 className="mb-2 text-sm font-medium text-foreground">Settings</h2>
       <div className="flex flex-col gap-2">
         <Row label="Target length">
           <NativeSelect value={draft.resume.target_length} onChange={(v) => void setTargetLength(v as TargetLength)}>
@@ -110,7 +110,7 @@ function cap(s: string) {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex items-center justify-between gap-2 text-sm">
-      <span className="text-gray-600 dark:text-gray-400">{label}</span>
+      <span className="text-muted-foreground">{label}</span>
       {children}
     </label>
   );
@@ -121,7 +121,7 @@ function NativeSelect({ value, onChange, children }: { value: string; onChange: 
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-32 rounded-md border border-gray-200 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-900"
+      className="w-32 rounded-md border border-border px-2 py-1 text-sm"
     >
       {children}
     </select>

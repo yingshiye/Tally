@@ -47,11 +47,11 @@ export function UpcomingPanel({
               onClick={() => application && setSelectedApplication(application)}
               disabled={!application}
               aria-label={application ? `Open ${application.company} application for ${event.title}` : undefined}
-              className="flex w-full items-center gap-3 rounded-md px-1 py-1.5 text-left transition-colors hover:bg-muted/60 focus-visible:bg-muted/60 disabled:cursor-default"
+              className="flex w-full items-center gap-3 rounded-md px-1 py-1.5 text-left transition-colors duration-150 hover:bg-muted/60 active:bg-muted focus-visible:bg-muted/60 disabled:cursor-default"
             >
               <span
                 className={`h-2 w-2 shrink-0 rounded-full ${
-                  isOfferRelated ? "bg-chart-5" : "bg-chart-4"
+                  isOfferRelated ? "bg-success" : "bg-warning"
                 }`}
               />
               <span className="min-w-0 flex-1">
@@ -62,7 +62,7 @@ export function UpcomingPanel({
                   </span>
                 )}
               </span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs tabular-nums text-muted-foreground">
                 {formatEventDate(event.event_date)}
               </span>
             </button>

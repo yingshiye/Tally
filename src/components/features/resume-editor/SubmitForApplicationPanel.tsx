@@ -115,13 +115,13 @@ export function SubmitForApplicationPanel({ application }: { application: Submit
   const blockingIssues = issues.filter((i) => i.severity === "blocking");
 
   return (
-    <div className="border-b border-blue-100 bg-blue-50 px-4 py-3 text-sm print:hidden dark:border-blue-900 dark:bg-blue-950">
+    <div className="border-b border-info/40 bg-info-bg px-4 py-3 text-sm print:hidden">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-medium text-blue-900 dark:text-blue-200">
+          <p className="font-medium text-info-text">
             Submitting this resume for {application.company} — {application.role}
           </p>
-          <p className="text-xs text-blue-800 dark:text-blue-300">
+          <p className="text-xs text-info-text">
             Saves your changes, runs preflight, records an immutable submitted version, and attaches that version to
             the application.
           </p>
@@ -138,7 +138,7 @@ export function SubmitForApplicationPanel({ application }: { application: Submit
       </div>
 
       {mismatches.length > 0 && phase !== "done" && (
-        <div className="mt-2 rounded-md bg-amber-100 px-2.5 py-2 text-xs text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+        <div className="mt-2 rounded-md bg-warning-bg px-2.5 py-2 text-xs text-warning-text">
           <p className="flex items-center gap-1.5 font-medium">
             <AlertTriangle className="h-3.5 w-3.5" /> The resume&apos;s target does not match this application
           </p>
@@ -158,13 +158,13 @@ export function SubmitForApplicationPanel({ application }: { application: Submit
       )}
 
       {hasUnsavedChanges && phase === "idle" && (
-        <p className="mt-2 text-xs text-blue-800 dark:text-blue-300">
+        <p className="mt-2 text-xs text-info-text">
           You have unsaved changes; they will be saved first.
         </p>
       )}
 
       {blockingIssues.length > 0 && (
-        <ul role="alert" className="mt-2 rounded-md bg-red-50 px-2.5 py-2 text-xs text-red-700 dark:bg-red-950 dark:text-red-300">
+        <ul role="alert" className="mt-2 rounded-md bg-danger-bg px-2.5 py-2 text-xs text-danger-text">
           {blockingIssues.map((i) => (
             <li key={i.id}>{i.message}</li>
           ))}
@@ -176,7 +176,7 @@ export function SubmitForApplicationPanel({ application }: { application: Submit
           role="status"
           aria-live="polite"
           className={`mt-2 flex items-center gap-1.5 text-xs ${
-            phase === "done" ? "text-green-800 dark:text-green-300" : "text-red-700 dark:text-red-300"
+            phase === "done" ? "text-success-text" : "text-danger-text"
           }`}
         >
           {phase === "done" && <CheckCircle2 className="h-3.5 w-3.5" />}
@@ -186,11 +186,11 @@ export function SubmitForApplicationPanel({ application }: { application: Submit
       )}
 
       {phase === "confirm_replace" && createdVersion && (
-        <div className="mt-2 rounded-md border border-amber-200 bg-amber-50 p-2.5 text-xs dark:border-amber-900 dark:bg-amber-950">
-          <p className="font-medium text-amber-900 dark:text-amber-200">
+        <div className="mt-2 rounded-md border border-warning/40 bg-warning-bg p-2.5 text-xs">
+          <p className="font-medium text-warning-text">
             This application already has a submitted version attached.
           </p>
-          <p className="mt-0.5 text-amber-800 dark:text-amber-300">
+          <p className="mt-0.5 text-warning-text">
             Version {createdVersion.number} was created and kept. Replace the attached version with it? The previous
             version is not deleted.
           </p>

@@ -86,7 +86,7 @@ export function EditableHeader() {
       <button
         type="button"
         onClick={() => setLinksOpen(true)}
-        className="mt-1 inline-flex items-center gap-1 rounded text-xs text-gray-400 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-1 print:hidden"
+        className="mt-1 inline-flex items-center gap-1 rounded text-xs text-muted-foreground hover:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-1 print:hidden"
       >
         <Link2 className="h-3 w-3" />
         {customLinks.length > 0 ? `Edit ${customLinks.length} custom link${customLinks.length === 1 ? "" : "s"}` : "Add custom links"}

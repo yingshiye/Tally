@@ -96,12 +96,12 @@ export function AddResumeModal() {
               id="resume-template"
               value={form.template}
               onChange={(e) => set("template", e.target.value)}
-              className="h-9 rounded-md border border-gray-200 bg-transparent px-3 text-sm dark:border-gray-700 dark:bg-gray-900"
+              className="h-9 rounded-md border border-border bg-transparent px-3 text-sm"
             >
               <option value="engineering">Engineering Resume</option>
               <option value="blank">Blank resume</option>
             </select>
-            <p className="text-xs text-gray-500">Engineering Resume creates Education, Experience, Projects, and Skills.</p>
+            <p className="text-xs text-muted-foreground">Engineering Resume creates Education, Experience, Projects, and Skills.</p>
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="resume-name">Name</Label>
@@ -132,7 +132,7 @@ export function AddResumeModal() {
             />
           </div>
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-danger-text">{error}</p>
           )}
           <div className="flex justify-end gap-2 pt-1">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>

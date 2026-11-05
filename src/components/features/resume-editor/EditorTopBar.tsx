@@ -48,10 +48,10 @@ function StatusPill({ status }: { status: SaveStatus }) {
             : Check;
   const color =
     status === "failed"
-      ? "text-red-600"
+      ? "text-danger-text"
       : status === "offline" || status === "unsaved"
-        ? "text-amber-600"
-        : "text-gray-500";
+        ? "text-warning-text"
+        : "text-muted-foreground";
   return (
     <span
       className={`flex items-center gap-1.5 text-xs ${color}`}
@@ -94,13 +94,13 @@ export function EditorTopBar({ userId }: { userId: string }) {
     conflict || saveStatus === "unsaved" || saveStatus === "saving" || saveStatus === "failed";
 
   return (
-    <div className="flex flex-col border-b border-gray-100 print:hidden dark:border-gray-800">
+    <div className="flex flex-col border-b border-border print:hidden ">
       <div className="flex min-h-14 flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2">
         <div className="flex min-w-0 items-center gap-3">
           <Tooltip label="Back to resumes">
             <Link
               href="/resumes"
-              className="rounded text-gray-500 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 dark:hover:text-gray-100"
+              className="rounded text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 "
               aria-label="Back to resumes"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -108,7 +108,7 @@ export function EditorTopBar({ userId }: { userId: string }) {
           </Tooltip>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+              <span className="truncate text-sm font-medium text-foreground">
                 {draft.resume.name}
               </span>
               <Tooltip label="Edit resume details">
@@ -116,13 +116,13 @@ export function EditorTopBar({ userId }: { userId: string }) {
                   type="button"
                   onClick={() => setMetadataOpen(true)}
                   aria-label="Edit resume name, target company and role"
-                  className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-1 dark:hover:bg-gray-800"
+                  className="rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 "
                 >
                   <Pencil className="h-3 w-3" />
                 </button>
               </Tooltip>
             </div>
-            <p className="truncate text-xs text-gray-400">
+            <p className="truncate text-xs text-muted-foreground">
               {draft.resume.target_company || draft.resume.target_role
                 ? [draft.resume.target_company, draft.resume.target_role].filter(Boolean).join(" · ")
                 : "No target company or role set"}
@@ -137,7 +137,7 @@ export function EditorTopBar({ userId }: { userId: string }) {
               <RefreshCw className="h-3 w-3" /> Retry
             </Button>
           )}
-          <div className="mx-1 h-5 w-px bg-gray-200 dark:bg-gray-700" />
+          <div className="mx-1 h-5 w-px bg-muted" />
           <Tooltip label="Undo">
             <span className="inline-flex">
               <Button
@@ -166,7 +166,7 @@ export function EditorTopBar({ userId }: { userId: string }) {
               </Button>
             </span>
           </Tooltip>
-          <div className="mx-1 h-5 w-px bg-gray-200 dark:bg-gray-700" />
+          <div className="mx-1 h-5 w-px bg-muted" />
           <Button
             variant="outline"
             size="sm"
@@ -192,8 +192,8 @@ export function EditorTopBar({ userId }: { userId: string }) {
           aria-live="polite"
           className={`flex items-center justify-between gap-3 px-4 py-1.5 text-xs ${
             checkpointMessage.ok
-              ? "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-300"
-              : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300"
+              ? "bg-success-bg text-success-text"
+              : "bg-danger-bg text-danger-text"
           }`}
         >
           <span>{checkpointMessage.text}</span>
@@ -204,7 +204,7 @@ export function EditorTopBar({ userId }: { userId: string }) {
       )}
 
       {conflict && (
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-amber-50 px-4 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-warning-bg px-4 py-2 text-sm text-warning-text">
           <span className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>
@@ -220,7 +220,7 @@ export function EditorTopBar({ userId }: { userId: string }) {
       )}
 
       {lastError && saveStatus === "failed" && !conflict && (
-        <div role="alert" className="bg-red-50 px-4 py-1.5 text-xs text-red-700 dark:bg-red-950 dark:text-red-300">
+        <div role="alert" className="bg-danger-bg px-4 py-1.5 text-xs text-danger-text">
           {lastError} Retrying is safe — it re-sends only this one change.
         </div>
       )}

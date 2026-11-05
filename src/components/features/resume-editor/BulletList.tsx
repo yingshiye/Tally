@@ -46,21 +46,21 @@ export function BulletList({ entryId, hasSourceBlock, addLabel = "Add bullet" }:
       </ul>
 
       <div className="mt-1 flex items-center gap-2 print:hidden">
-        <button type="button" onClick={() => void addCustomBullet(entryId)} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600">
+        <button type="button" onClick={() => void addCustomBullet(entryId)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-muted-foreground">
           <Plus className="h-3 w-3" /> {addLabel}
         </button>
         {hasSourceBlock && availableLibraryBullets.length > 0 && (
           <div className="relative">
-            <button type="button" onClick={() => setLibraryPickerOpen((o) => !o)} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600">
+            <button type="button" onClick={() => setLibraryPickerOpen((o) => !o)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-muted-foreground">
               <Library className="h-3 w-3" /> From library
             </button>
             {libraryPickerOpen && (
-              <div className="absolute left-0 top-6 z-20 w-72 rounded-md border border-gray-200 bg-white p-1 shadow-md dark:border-gray-700 dark:bg-gray-900">
+              <div className="absolute left-0 top-6 z-20 w-72 rounded-md border border-border bg-card p-1 shadow-md">
                 {availableLibraryBullets.map((lb) => (
                   <button
                     key={lb.id}
                     type="button"
-                    className="block w-full truncate rounded px-2 py-1 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="block w-full truncate rounded px-2 py-1 text-left text-xs hover:bg-muted"
                     onClick={() => {
                       void addBulletFromLibrary(entryId, lb.id);
                       setLibraryPickerOpen(false);
@@ -147,7 +147,7 @@ function BulletRow({
 
 function MiniBtn({ label, onClick, disabled, children }: { label: string; onClick: () => void; disabled?: boolean; children: React.ReactNode }) {
   const button = (
-    <button type="button" aria-label={label} onClick={onClick} disabled={disabled} className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 dark:hover:bg-gray-800">
+    <button type="button" aria-label={label} onClick={onClick} disabled={disabled} className="rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 ">
       {children}
     </button>
   );

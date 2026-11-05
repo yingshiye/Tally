@@ -75,7 +75,7 @@ export function EntryCard({
           if (!event.currentTarget.contains(event.relatedTarget)) setSelected(false);
         }}
       >
-        <div className={`absolute left-full top-0 z-20 ml-2 flex items-center gap-0.5 rounded-md bg-white/95 p-0.5 shadow-sm ring-1 ring-gray-200 transition-opacity print:hidden dark:bg-gray-900/95 dark:ring-gray-700 ${selected ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+        <div className={`absolute left-full top-0 z-20 ml-2 flex items-center gap-0.5 rounded-md bg-card/95 p-0.5 shadow-sm ring-1 ring-border transition-opacity print:hidden   ${selected ? "opacity-100" : "pointer-events-none opacity-0"}`}>
           {hasLibraryLink && (
             <EntryIconBtn label="View library changes" onClick={() => setUpdateOpen(true)}>
               <RefreshCw className="h-3.5 w-3.5" />
@@ -96,7 +96,7 @@ export function EntryCard({
             <div className="relative">
               <select
                 aria-label="Move entry to section"
-                className="h-6 cursor-pointer rounded border border-gray-200 bg-white text-xs dark:border-gray-700 dark:bg-gray-900"
+                className="h-6 cursor-pointer rounded border border-border bg-card text-xs"
                 value=""
                 onChange={(e) => {
                   if (e.target.value) moveToSection(e.target.value);
@@ -288,7 +288,7 @@ function SkillsLayout({ entry, onUpdate }: { entry: ResumeEntry; onUpdate: Updat
                     style={inputStyle}
                   />
                   {k < cat.items.length - 1 && <span aria-hidden="true">,</span>}
-                  <span className="absolute left-0 top-full z-20 hidden items-center rounded bg-white p-0.5 shadow-sm ring-1 ring-gray-200 group-hover/item:inline-flex group-focus-within/item:inline-flex print:hidden dark:bg-gray-900 dark:ring-gray-700">
+                  <span className="absolute left-0 top-full z-20 hidden items-center rounded bg-card p-0.5 shadow-sm ring-1 ring-border group-hover/item:inline-flex group-focus-within/item:inline-flex print:hidden">
                     <MicroBtn
                       label={`Move skill ${k + 1} left`}
                       disabled={k === 0}
@@ -321,12 +321,12 @@ function SkillsLayout({ entry, onUpdate }: { entry: ResumeEntry; onUpdate: Updat
               <button
                 type="button"
                 onClick={() => patchCategory(i, { items: [...cat.items, "New skill"] })}
-                className="rounded text-xs text-gray-400 opacity-0 transition-opacity hover:text-gray-600 focus:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-1 group-hover/cat:opacity-100 group-focus-within/cat:opacity-100 print:hidden"
+                className="rounded text-xs text-muted-foreground opacity-0 transition-opacity hover:text-muted-foreground focus:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-1 group-hover/cat:opacity-100 group-focus-within/cat:opacity-100 print:hidden"
               >
                 + skill
               </button>
           </div>
-          <span className="absolute -right-1 top-0 z-10 hidden items-center gap-0.5 rounded bg-white p-0.5 shadow-sm ring-1 ring-gray-200 group-hover/cat:flex group-focus-within/cat:flex print:hidden dark:bg-gray-900 dark:ring-gray-700">
+          <span className="absolute -right-1 top-0 z-10 hidden items-center gap-0.5 rounded bg-card p-0.5 shadow-sm ring-1 ring-border group-hover/cat:flex group-focus-within/cat:flex print:hidden">
               <MicroBtn
                 label={`Move category ${i + 1} up`}
                 disabled={i === 0}
@@ -359,7 +359,7 @@ function SkillsLayout({ entry, onUpdate }: { entry: ResumeEntry; onUpdate: Updat
       <button
         type="button"
         onClick={() => setCategories([...categories, { label: "New category", items: ["New skill"] }])}
-        className="self-start rounded text-xs text-gray-400 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-1 print:hidden"
+        className="self-start rounded text-xs text-muted-foreground hover:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-1 print:hidden"
       >
         + Add category
       </button>
@@ -384,7 +384,7 @@ function MicroBtn({
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-offset-1 dark:hover:bg-gray-800"
+      className="rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-offset-1 "
     >
       {children}
     </button>
@@ -404,7 +404,7 @@ function EntryIconBtn({ label, onClick, disabled, children }: { label: string; o
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className="rounded bg-white/80 p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 dark:bg-gray-900/80 dark:hover:bg-gray-800"
+      className="rounded bg-card/80 p-1 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30"
     >
       {children}
     </button>

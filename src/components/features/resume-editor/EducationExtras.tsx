@@ -49,7 +49,7 @@ export function EducationExtraLines({
                 type="button"
                 aria-label={`Remove: ${line.text}`}
                 onClick={() => onChange(line.clear)}
-                className="ml-1.5 inline-flex align-middle text-gray-400 opacity-0 hover:text-gray-700 focus:opacity-100 group-hover/extra:opacity-100 print:hidden"
+                className="ml-1.5 inline-flex align-middle text-muted-foreground opacity-0 hover:text-foreground focus:opacity-100 group-hover/extra:opacity-100 print:hidden"
               >
                 <X className="h-3 w-3" />
               </button>

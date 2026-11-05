@@ -55,7 +55,7 @@ export function ResumeEditor({
 
           {/* Tab bar: only present on narrow screens. */}
           <div
-            className="flex items-center gap-1 border-b border-gray-100 px-2 py-1.5 xl:hidden print:hidden dark:border-gray-800"
+            className="flex items-center gap-1 border-b border-border px-2 py-1.5 xl:hidden print:hidden "
             role="tablist"
             aria-label="Editor panes"
           >
@@ -70,8 +70,8 @@ export function ResumeEditor({
                 onClick={() => setPane(id)}
                 className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 ${
                   pane === id
-                    ? "bg-gray-100 font-medium text-gray-900 dark:bg-gray-800 dark:text-gray-100"
-                    : "text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900"
+                    ? "bg-muted font-medium text-foreground"
+                    : "text-muted-foreground hover:bg-muted"
                 }`}
               >
                 <Icon className="h-4 w-4" /> {label}
@@ -102,7 +102,7 @@ export function ResumeEditor({
               role="tabpanel"
               id="editor-pane-settings"
               aria-labelledby="editor-tab-settings"
-              className={`flex-col overflow-y-auto border-l border-gray-100 dark:border-gray-800 ${
+              className={`flex-col overflow-y-auto border-l border-border  ${
                 pane === "settings" ? "flex" : "hidden"
               } xl:flex`}
             >
@@ -110,13 +110,13 @@ export function ResumeEditor({
                 <button
                   type="button"
                   onClick={() => setSettingsCollapsed((value) => !value)}
-                  className="hidden h-11 items-center justify-center border-b border-gray-100 text-gray-500 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-[-2px] xl:flex dark:border-gray-800 dark:hover:bg-gray-900"
+                  className="hidden h-11 items-center justify-center border-b border-border text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-[-2px] xl:flex"
                   aria-label={settingsCollapsed ? "Expand settings panel" : "Collapse settings panel"}
                 >
                   {settingsCollapsed ? <PanelRightOpen className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
                 </button>
               </Tooltip>
-              <p className="flex items-start gap-2 border-b border-gray-100 px-3 py-2 text-xs text-gray-500 xl:hidden dark:border-gray-800">
+              <p className="flex items-start gap-2 border-b border-border px-3 py-2 text-xs text-muted-foreground xl:hidden ">
                 <MonitorSmartphone className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 Reliable Letter-size PDF export needs desktop Google Chrome. Everything else — editing, version
                 history, snapshots — works here.

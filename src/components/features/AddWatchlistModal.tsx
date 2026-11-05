@@ -115,7 +115,7 @@ export function AddWatchlistModal({ userId }: { userId: string }) {
             />
           </div>
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-danger-text">{error}</p>
           )}
           <div className="flex justify-end gap-2 pt-1">
             <Button

@@ -140,7 +140,7 @@ export function LibraryBlockForm({
         details={values}
         setDetail={(field, value) => onChange({ ...values, [field]: value })}
       />
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-sm text-danger-text">{error}</p>}
       <div className="flex justify-end gap-2 pt-1">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel

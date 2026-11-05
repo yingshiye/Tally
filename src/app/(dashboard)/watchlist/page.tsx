@@ -17,12 +17,12 @@ export default async function WatchlistPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 p-4 sm:p-6 lg:p-8">
       <div>
-        <h1 className="text-xl font-medium text-gray-900 dark:text-gray-100">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
           Watchlist
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="mt-1 text-sm text-muted-foreground">
           Sites you&apos;re monitoring for job openings.
         </p>
       </div>

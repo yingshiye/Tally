@@ -12,11 +12,11 @@ import type { ChangeKind, FieldChange, SnapshotDiff } from "@/lib/resume/version
  */
 
 const KIND_META: Record<ChangeKind, { label: string; icon: typeof Plus; className: string }> = {
-  added: { label: "Added", icon: Plus, className: "text-green-700 dark:text-green-400" },
-  removed: { label: "Removed", icon: Minus, className: "text-red-700 dark:text-red-400" },
-  changed: { label: "Changed", icon: PencilLine, className: "text-amber-700 dark:text-amber-400" },
-  reordered: { label: "Moved", icon: ArrowUpDown, className: "text-blue-700 dark:text-blue-400" },
-  unchanged: { label: "Unchanged", icon: Equal, className: "text-gray-400" },
+  added: { label: "Added", icon: Plus, className: "text-success-text" },
+  removed: { label: "Removed", icon: Minus, className: "text-danger-text" },
+  changed: { label: "Changed", icon: PencilLine, className: "text-warning-text" },
+  reordered: { label: "Moved", icon: ArrowUpDown, className: "text-info-text" },
+  unchanged: { label: "Unchanged", icon: Equal, className: "text-muted-foreground" },
 };
 
 function KindTag({ kind }: { kind: ChangeKind }) {
@@ -33,12 +33,12 @@ function KindTag({ kind }: { kind: ChangeKind }) {
 function FieldChangeRow({ change }: { change: FieldChange }) {
   return (
     <li className="grid grid-cols-[8rem_1fr] gap-2 py-0.5 text-xs sm:grid-cols-[10rem_1fr_1fr]">
-      <span className="text-gray-500">{change.label}</span>
-      <span className="text-red-700 line-through decoration-red-400/60 dark:text-red-400">
-        {change.before ?? <span className="not-italic text-gray-400 no-underline">(empty)</span>}
+      <span className="text-muted-foreground">{change.label}</span>
+      <span className="text-danger-text line-through decoration-red-400/60 ">
+        {change.before ?? <span className="not-italic text-muted-foreground no-underline">(empty)</span>}
       </span>
-      <span className="text-green-700 dark:text-green-400">
-        {change.after ?? <span className="text-gray-400">(empty)</span>}
+      <span className="text-success-text">
+        {change.after ?? <span className="text-muted-foreground">(empty)</span>}
       </span>
     </li>
   );
@@ -55,7 +55,7 @@ export function VersionCompareView({
 }) {
   if (!diff.hasChanges) {
     return (
-      <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800 dark:bg-green-950 dark:text-green-300">
+      <p className="rounded-md bg-success-bg px-3 py-2 text-sm text-success-text">
         No differences between {beforeLabel} and {afterLabel}.
       </p>
     );
@@ -65,14 +65,14 @@ export function VersionCompareView({
 
   return (
     <div className="flex flex-col gap-4 text-sm">
-      <p className="text-xs text-gray-500">
-        Comparing <span className="font-medium text-gray-700 dark:text-gray-300">{beforeLabel}</span> (struck through)
-        with <span className="font-medium text-gray-700 dark:text-gray-300">{afterLabel}</span>.
+      <p className="text-xs text-muted-foreground">
+        Comparing <span className="font-medium text-foreground">{beforeLabel}</span> (struck through)
+        with <span className="font-medium text-foreground">{afterLabel}</span>.
       </p>
 
       {diff.headerChanges.length > 0 && (
         <section>
-          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Header</h4>
+          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Header</h4>
           <ul>
             {diff.headerChanges.map((c) => (
               <FieldChangeRow key={c.field} change={c} />
@@ -83,7 +83,7 @@ export function VersionCompareView({
 
       {diff.metaChanges.length > 0 && (
         <section>
-          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Resume settings</h4>
+          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Resume settings</h4>
           <ul>
             {diff.metaChanges.map((c) => (
               <FieldChangeRow key={c.field} change={c} />
@@ -94,7 +94,7 @@ export function VersionCompareView({
 
       {diff.styleChanges.length > 0 && (
         <section>
-          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Style</h4>
+          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Style</h4>
           <ul>
             {diff.styleChanges.map((c) => (
               <FieldChangeRow key={c.field} change={c} />
@@ -105,12 +105,12 @@ export function VersionCompareView({
 
       {changedSections.length > 0 && (
         <section>
-          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Sections</h4>
+          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Sections</h4>
           <ul className="flex flex-col gap-2">
             {changedSections.map((section) => (
-              <li key={section.key} className="rounded-md border border-gray-100 p-2 dark:border-gray-800">
+              <li key={section.key} className="rounded-md border border-border p-2 ">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-gray-800 dark:text-gray-200">{section.title}</span>
+                  <span className="font-medium text-foreground">{section.title}</span>
                   <KindTag kind={section.kind} />
                 </div>
                 {section.titleChange && (
@@ -119,7 +119,7 @@ export function VersionCompareView({
                   </ul>
                 )}
                 {section.kind === "reordered" && section.fromIndex !== null && section.toIndex !== null && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Moved from position {section.fromIndex + 1} to {section.toIndex + 1}.
                   </p>
                 )}
@@ -127,13 +127,13 @@ export function VersionCompareView({
                   {section.entries
                     .filter((e) => e.kind !== "unchanged")
                     .map((entry) => (
-                      <li key={entry.key} className="rounded border border-gray-100 p-1.5 dark:border-gray-800">
+                      <li key={entry.key} className="rounded border border-border p-1.5 ">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs text-gray-700 dark:text-gray-300">{entry.label}</span>
+                          <span className="text-xs text-foreground">{entry.label}</span>
                           <KindTag kind={entry.kind} />
                         </div>
                         {entry.kind === "reordered" && entry.fromIndex !== null && entry.toIndex !== null && (
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             Moved from position {entry.fromIndex + 1} to {entry.toIndex + 1}.
                           </p>
                         )}
@@ -156,11 +156,11 @@ export function VersionCompareView({
                                   <span className="min-w-0">
                                     {b.kind === "changed" ? (
                                       <>
-                                        <span className="text-red-700 line-through dark:text-red-400">{b.before}</span>{" "}
-                                        <span className="text-green-700 dark:text-green-400">{b.after}</span>
+                                        <span className="text-danger-text line-through ">{b.before}</span>{" "}
+                                        <span className="text-success-text">{b.after}</span>
                                       </>
                                     ) : (
-                                      <span className="text-gray-700 dark:text-gray-300">{b.after ?? b.before}</span>
+                                      <span className="text-foreground">{b.after ?? b.before}</span>
                                     )}
                                   </span>
                                 </li>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Inbox, SearchX } from "lucide-react";
 import type { Tables } from "@/types/supabase";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getNextEvent } from "@/lib/applications/next-event";
@@ -143,7 +143,7 @@ export function ApplicationList({
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search company or role…"
             aria-label="Search applications by company or role"
-            className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-[200px]"
+            className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-[200px]"
           />
           <div className="scrollbar-visible flex gap-1 overflow-x-auto pb-1 sm:pb-0" role="group" aria-label="Filter applications by status">
             {FILTERS.map((f) => (
@@ -151,7 +151,7 @@ export function ApplicationList({
                 key={f.value}
                 onClick={() => setFilter(f.value)}
                 aria-pressed={filter === f.value}
-                className={`whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                className={`whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium transition-[color,background-color,transform] duration-150 active:scale-95 ${
                   filter === f.value
                     ? "bg-foreground text-background"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -166,7 +166,7 @@ export function ApplicationList({
       <div className="scrollbar-visible max-h-[65vh] overflow-auto">
         <table className="w-full min-w-[760px] border-collapse text-left">
           <thead className="sticky top-0 z-10">
-            <tr className="border-b border-border bg-muted/95 text-[11px] uppercase tracking-wide text-muted-foreground backdrop-blur">
+            <tr className="border-b border-border bg-muted text-[11px] uppercase tracking-wide text-muted-foreground">
               {COLUMNS.map((col) => {
                 const isActive = sortColumn === col.key;
                 const ariaSort = isActive
@@ -179,7 +179,7 @@ export function ApplicationList({
                     <button
                       type="button"
                       onClick={() => toggleSort(col.key)}
-                      className="flex items-center gap-1 rounded-sm text-[11px] font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="flex items-center gap-1 whitespace-nowrap rounded-sm text-[11px] font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       {col.label}
                       {isActive ? (
@@ -201,16 +201,45 @@ export function ApplicationList({
           <tbody className="divide-y divide-border">
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-sm text-muted-foreground">
-                  {applications.length === 0
-                    ? 'No applications yet — click "Add application" to get started.'
-                    : "No applications match this filter."}
+                <td colSpan={5} className="px-4 py-16">
+                  <div className="mx-auto flex max-w-sm flex-col items-center text-center">
+                    <span className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                      {applications.length === 0 ? (
+                        <Inbox className="size-5" aria-hidden="true" />
+                      ) : (
+                        <SearchX className="size-5" aria-hidden="true" />
+                      )}
+                    </span>
+                    <p className="mt-3 text-sm font-medium text-foreground">
+                      {applications.length === 0
+                        ? "No applications yet"
+                        : "No matching applications"}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {applications.length === 0
+                        ? 'Use "Add application" at the top of the page to log your first one.'
+                        : "Try a different search or status filter."}
+                    </p>
+                    {applications.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFilter("all");
+                          setSearch("");
+                        }}
+                        className="mt-3 rounded-md border border-input px-3 py-1.5 text-xs font-medium text-foreground transition-[background-color,transform] duration-150 hover:bg-muted active:scale-95"
+                      >
+                        Clear filters
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ) : (
-              sorted.map((app) => (
+              sorted.map((app, index) => (
                 <ApplicationRow
                   key={app.id}
+                  index={index}
                   application={app}
                   events={events}
                   nextEvent={nextEventByAppId.get(app.id) ?? null}

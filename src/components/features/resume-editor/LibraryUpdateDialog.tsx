@@ -70,9 +70,9 @@ export function LibraryUpdateDialog({ entryId, open, onOpenChange }: { entryId: 
           <DialogDescription>Choose which changes from the source library block to apply. Your resume-specific edits stay unless you select them.</DialogDescription>
         </DialogHeader>
 
-        {comparison === "loading" && <p className="py-4 text-sm text-gray-500">Comparing…</p>}
-        {comparison === null && <p className="py-4 text-sm text-gray-500">This entry is no longer linked to a library block.</p>}
-        {comparison && comparison !== "loading" && !hasChanges && <p className="py-4 text-sm text-gray-500">This entry matches its library block.</p>}
+        {comparison === "loading" && <p className="py-4 text-sm text-muted-foreground">Comparing…</p>}
+        {comparison === null && <p className="py-4 text-sm text-muted-foreground">This entry is no longer linked to a library block.</p>}
+        {comparison && comparison !== "loading" && !hasChanges && <p className="py-4 text-sm text-muted-foreground">This entry matches its library block.</p>}
 
         {comparison && comparison !== "loading" && hasChanges && (
           <div className="flex max-h-[55vh] flex-col gap-3 overflow-y-auto text-sm">
@@ -80,7 +80,7 @@ export function LibraryUpdateDialog({ entryId, open, onOpenChange }: { entryId: 
               <Section title="Field changes">
                 {comparison.blockFieldDiffs.map((d) => (
                   <Row key={d.field} checked={fields.has(d.field)} onChange={() => toggle(fields, setFields, d.field)}>
-                    <span className="font-medium">{d.field}</span>: <span className="text-gray-400 line-through">{String(d.entryValue ?? "—")}</span> → <span>{String(d.blockValue ?? "—")}</span>
+                    <span className="font-medium">{d.field}</span>: <span className="text-muted-foreground line-through">{String(d.entryValue ?? "—")}</span> → <span>{String(d.blockValue ?? "—")}</span>
                   </Row>
                 ))}
               </Section>
@@ -89,7 +89,7 @@ export function LibraryUpdateDialog({ entryId, open, onOpenChange }: { entryId: 
               <Section title="Updated bullets (reset to library text)">
                 {comparison.bulletsChanged.map((b) => (
                   <Row key={b.entryBulletId} checked={updates.has(b.entryBulletId)} onChange={() => toggle(updates, setUpdates, b.entryBulletId)}>
-                    <span className="text-gray-400 line-through">{b.entryContent}</span> → <span>{b.libraryContent}</span>
+                    <span className="text-muted-foreground line-through">{b.entryContent}</span> → <span>{b.libraryContent}</span>
                   </Row>
                 ))}
               </Section>
@@ -115,7 +115,7 @@ export function LibraryUpdateDialog({ entryId, open, onOpenChange }: { entryId: 
           </div>
         )}
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-danger-text">{error}</p>}
 
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -135,7 +135,7 @@ export function LibraryUpdateDialog({ entryId, open, onOpenChange }: { entryId: 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-400">{title}</p>
+      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
       <div className="flex flex-col gap-1">{children}</div>
     </div>
   );
