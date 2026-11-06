@@ -287,6 +287,403 @@ export type Database = {
       };
 
       // ─── Resume Builder: master library ────────────────────────────────
+      planner_blocks: {
+        Row: {
+          created_at: string;
+          end_at: string;
+          id: string;
+          kind: "task" | "starter" | "break";
+          locked: boolean;
+          start_at: string;
+          status: "planned" | "done" | "skipped";
+          task_id: string | null;
+          title: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          end_at: string;
+          id?: string;
+          kind?: "task" | "starter" | "break";
+          locked?: boolean;
+          start_at: string;
+          status?: "planned" | "done" | "skipped";
+          task_id?: string | null;
+          title: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          end_at?: string;
+          id?: string;
+          kind?: "task" | "starter" | "break";
+          locked?: boolean;
+          start_at?: string;
+          status?: "planned" | "done" | "skipped";
+          task_id?: string | null;
+          title?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "planner_blocks_task_id_fkey";
+            columns: ["task_id"];
+            isOneToOne: false;
+            referencedRelation: "planner_tasks";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      planner_calendar_events: {
+        Row: {
+          all_day: boolean;
+          created_at: string;
+          end_at: string;
+          external_id: string | null;
+          id: string;
+          source: string;
+          start_at: string;
+          title: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          all_day?: boolean;
+          created_at?: string;
+          end_at: string;
+          external_id?: string | null;
+          id?: string;
+          source?: string;
+          start_at: string;
+          title: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          all_day?: boolean;
+          created_at?: string;
+          end_at?: string;
+          external_id?: string | null;
+          id?: string;
+          source?: string;
+          start_at?: string;
+          title?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      planner_changes: {
+        Row: {
+          action: "create" | "move" | "resize" | "postpone" | "complete" | "drop" | "pin" | "unpin";
+          after: Json | null;
+          before: Json | null;
+          created_at: string;
+          entity_id: string;
+          entity_type: string;
+          id: string;
+          reason: string | null;
+          user_id: string;
+        };
+        Insert: {
+          action: "create" | "move" | "resize" | "postpone" | "complete" | "drop" | "pin" | "unpin";
+          after?: Json | null;
+          before?: Json | null;
+          created_at?: string;
+          entity_id: string;
+          entity_type: string;
+          id?: string;
+          reason?: string | null;
+          user_id: string;
+        };
+        Update: {
+          action?: "create" | "move" | "resize" | "postpone" | "complete" | "drop" | "pin" | "unpin";
+          after?: Json | null;
+          before?: Json | null;
+          created_at?: string;
+          entity_id?: string;
+          entity_type?: string;
+          id?: string;
+          reason?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      planner_goal_logs: {
+        Row: {
+          count: number;
+          goal_key: string;
+          local_date: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          count?: number;
+          goal_key: string;
+          local_date: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          count?: number;
+          goal_key?: string;
+          local_date?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      planner_inbox_items: {
+        Row: {
+          created_at: string;
+          id: string;
+          raw_text: string;
+          status: "new" | "triaged" | "discarded";
+          task_id: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          raw_text: string;
+          status?: "new" | "triaged" | "discarded";
+          task_id?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          raw_text?: string;
+          status?: "new" | "triaged" | "discarded";
+          task_id?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "planner_inbox_items_task_id_fkey";
+            columns: ["task_id"];
+            isOneToOne: false;
+            referencedRelation: "planner_tasks";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      planner_goals: {
+        Row: {
+          archived_at: string | null;
+          created_at: string;
+          id: string;
+          key: string;
+          label: string;
+          sort: number;
+          target: number;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          archived_at?: string | null;
+          created_at?: string;
+          id?: string;
+          key: string;
+          label: string;
+          sort?: number;
+          target?: number;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          archived_at?: string | null;
+          created_at?: string;
+          id?: string;
+          key?: string;
+          label?: string;
+          sort?: number;
+          target?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      planner_integrations: {
+        Row: {
+          created_at: string;
+          id: string;
+          kind: "calendar_sync" | "calendar_feed";
+          last_used_at: string | null;
+          revoked_at: string | null;
+          token_hash: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          kind: "calendar_sync" | "calendar_feed";
+          last_used_at?: string | null;
+          revoked_at?: string | null;
+          token_hash: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          kind?: "calendar_sync" | "calendar_feed";
+          last_used_at?: string | null;
+          revoked_at?: string | null;
+          token_hash?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      planner_preferences: {
+        Row: {
+          buffer_min: number;
+          created_at: string;
+          deep_work_max: number;
+          deep_work_min: number;
+          goal_applications: number;
+          goal_connections: number;
+          goal_followups: number;
+          show_event_titles: boolean;
+          starter_min: number;
+          timezone: string;
+          top_n: number;
+          updated_at: string;
+          user_id: string;
+          work_end: string;
+          work_start: string;
+        };
+        Insert: {
+          buffer_min?: number;
+          created_at?: string;
+          deep_work_max?: number;
+          deep_work_min?: number;
+          goal_applications?: number;
+          goal_connections?: number;
+          goal_followups?: number;
+          show_event_titles?: boolean;
+          starter_min?: number;
+          timezone?: string;
+          top_n?: number;
+          updated_at?: string;
+          user_id: string;
+          work_end?: string;
+          work_start?: string;
+        };
+        Update: {
+          buffer_min?: number;
+          created_at?: string;
+          deep_work_max?: number;
+          deep_work_min?: number;
+          goal_applications?: number;
+          goal_connections?: number;
+          goal_followups?: number;
+          show_event_titles?: boolean;
+          starter_min?: number;
+          timezone?: string;
+          top_n?: number;
+          updated_at?: string;
+          user_id?: string;
+          work_end?: string;
+          work_start?: string;
+        };
+        Relationships: [];
+      };
+      planner_projects: {
+        Row: {
+          archived_at: string | null;
+          color: string | null;
+          created_at: string;
+          id: string;
+          kind: "job_search" | "grad_school" | "coursework" | "internship" | "teaching" | "personal" | "other";
+          name: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          archived_at?: string | null;
+          color?: string | null;
+          created_at?: string;
+          id?: string;
+          kind?: "job_search" | "grad_school" | "coursework" | "internship" | "teaching" | "personal" | "other";
+          name: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          archived_at?: string | null;
+          color?: string | null;
+          created_at?: string;
+          id?: string;
+          kind?: "job_search" | "grad_school" | "coursework" | "internship" | "teaching" | "personal" | "other";
+          name?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      planner_tasks: {
+        Row: {
+          completed_at: string | null;
+          created_at: string;
+          due_at: string | null;
+          estimate_min: number | null;
+          first_step: string | null;
+          id: string;
+          importance: 1 | 2 | 3;
+          notes: string | null;
+          parent_id: string | null;
+          project_id: string | null;
+          source: string;
+          status: "todo" | "doing" | "done" | "dropped";
+          title: string;
+          top3_date: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          created_at?: string;
+          due_at?: string | null;
+          estimate_min?: number | null;
+          first_step?: string | null;
+          id?: string;
+          importance?: 1 | 2 | 3;
+          notes?: string | null;
+          parent_id?: string | null;
+          project_id?: string | null;
+          source?: string;
+          status?: "todo" | "doing" | "done" | "dropped";
+          title: string;
+          top3_date?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          created_at?: string;
+          due_at?: string | null;
+          estimate_min?: number | null;
+          first_step?: string | null;
+          id?: string;
+          importance?: 1 | 2 | 3;
+          notes?: string | null;
+          parent_id?: string | null;
+          project_id?: string | null;
+          source?: string;
+          status?: "todo" | "doing" | "done" | "dropped";
+          title?: string;
+          top3_date?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       resume_library_blocks: {
         Row: {
           id: string;
