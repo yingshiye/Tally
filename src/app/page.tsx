@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { brand } from "@/lib/brand";
+import { TallyMark } from "@/components/brand/TallyMark";
 import { ArrowRight, Code2, Sparkles, ListChecks, Wand2 } from "lucide-react";
 import { HeroDemo } from "@/components/marketing/HeroDemo";
 import { PipelineDemo } from "@/components/marketing/PipelineDemo";
@@ -63,11 +65,11 @@ export default function LandingPage() {
       >
         <div className="flex h-12 items-center justify-between px-5">
           <Link href="/" className="flex items-center gap-2.5 rounded-md">
-            <span className="flex size-7 items-center justify-center rounded-md bg-foreground text-xs font-semibold text-background">
-              IT
+            <span className="flex size-7 items-center justify-center rounded-md bg-foreground text-background">
+              <TallyMark className="size-[18px]" />
             </span>
             <span className="text-sm font-semibold tracking-tight">
-              Internship Tracker
+              {brand.productName}
             </span>
           </Link>
           <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
@@ -120,7 +122,7 @@ export default function LandingPage() {
             <span className="text-primary">One place for your search.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-muted-foreground text-balance">
-            I built Internship Tracker to run my own internship search — a{" "}
+            I built {brand.productName} to run my own internship search — a{" "}
             <Strong>pipeline board</Strong>, a{" "}
             <Strong>resume editor that tailors bullets per role</Strong>, and{" "}
             <Strong>alerts when a careers page changes</Strong>. No more

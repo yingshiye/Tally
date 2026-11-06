@@ -1,8 +1,8 @@
-# Internship Tracker
+# Tally
 
 A full-stack workspace for running an internship search: track every application, keep upcoming interviews and deadlines visible, tailor resumes for individual roles, and monitor career pages for changes.
 
-![Internship Tracker dashboard](public/marketing/dashboard.png)
+![Tally dashboard](public/marketing/dashboard.png)
 
 ## Features
 

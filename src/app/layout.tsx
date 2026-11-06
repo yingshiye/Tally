@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Internship Tracker",
+  title: brand.productName,
   description: "Track your internship applications",
-  icons: { apple: "/icons/apple-touch-icon.png" },
+  icons: { icon: "/icon.svg", apple: "/icons/apple-touch-icon.png" },
   appleWebApp: { capable: true, title: brand.productName, statusBarStyle: "default" },
 };
 

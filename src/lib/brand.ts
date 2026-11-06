@@ -1,7 +1,6 @@
 // All user-facing product and module names live here so renaming is a one-file change.
-// "DayPilot" is a placeholder name.
 export const brand = {
-  productName: "DayPilot",
+  productName: "Tally",
   modules: {
     today: "Today",
     inbox: "Inbox",

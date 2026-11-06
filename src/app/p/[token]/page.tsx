@@ -5,11 +5,12 @@ import { ArrowRight } from "lucide-react";
 import { PrepProgressCard } from "@/components/features/PrepProgressCard";
 import { computeShareStats } from "@/lib/prep/share";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { brand } from "@/lib/brand";
 
 const TOKEN_PATTERN = /^[a-f0-9]{32}$/;
 
 export const metadata: Metadata = {
-  title: "NeetCode 150 progress · Internship Tracker",
+  title: `NeetCode 150 progress · ${brand.productName}`,
   robots: { index: false, follow: false },
 };
 

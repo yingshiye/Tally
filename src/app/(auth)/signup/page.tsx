@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { SignupForm } from "@/components/features/SignupForm";
+import { brand } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Create account — Internship Tracker",
+  title: `Create account — ${brand.productName}`,
 };
 
 export default function SignupPage() {

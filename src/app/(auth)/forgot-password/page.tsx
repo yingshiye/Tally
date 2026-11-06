@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { ForgotPasswordForm } from "@/components/features/ForgotPasswordForm";
+import { brand } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Reset password — Internship Tracker",
+  title: `Reset password — ${brand.productName}`,
 };
 
 export default function ForgotPasswordPage() {

@@ -13,7 +13,7 @@ const FEATURES = [
       "Every application lives in one board — status, next step, and upcoming events at a glance, filterable by stage from wishlist to offer.",
     image: "/marketing/dashboard.png",
     imageAlt:
-      "Internship Tracker dashboard showing a list of applications and pipeline stats",
+      "Tally dashboard showing a list of applications and pipeline stats",
     width: 1440,
     height: 760,
   },

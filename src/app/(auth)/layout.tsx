@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { brand } from "@/lib/brand";
+import { TallyMark } from "@/components/brand/TallyMark";
 import { Check, Eye, FileText, LayoutDashboard } from "lucide-react";
 
 const STAGES = [
@@ -119,11 +121,11 @@ export default function AuthLayout({
       <div className="flex flex-col">
         <header className="flex h-14 items-center px-4 sm:px-8 lg:hidden">
           <Link href="/" className="flex items-center gap-2.5 rounded-md">
-            <span className="flex size-7 items-center justify-center rounded-md bg-foreground text-xs font-semibold text-background">
-              IT
+            <span className="flex size-7 items-center justify-center rounded-md bg-foreground text-background">
+              <TallyMark className="size-[18px]" />
             </span>
             <span className="text-sm font-semibold tracking-tight">
-              Internship Tracker
+              {brand.productName}
             </span>
           </Link>
         </header>
@@ -142,11 +144,11 @@ export default function AuthLayout({
       <aside className="relative hidden lg:order-first lg:flex lg:flex-col lg:justify-center lg:px-16">
         <div className="absolute inset-x-0 top-0 flex h-14 items-center px-8">
           <Link href="/" className="flex items-center gap-2.5 rounded-md">
-            <span className="flex size-7 items-center justify-center rounded-md bg-foreground text-xs font-semibold text-background">
-              IT
+            <span className="flex size-7 items-center justify-center rounded-md bg-foreground text-background">
+              <TallyMark className="size-[18px]" />
             </span>
             <span className="text-sm font-semibold tracking-tight">
-              Internship Tracker
+              {brand.productName}
             </span>
           </Link>
         </div>

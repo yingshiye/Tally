@@ -8,6 +8,7 @@ import { isUsableToken } from "@/lib/planner/capture-auth";
 import { CalendarSettings } from "@/components/features/settings/CalendarSettings";
 import { getCalendarSyncStatus, getGoals, getPreferences } from "@/lib/planner/server/queries";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { brand } from "@/lib/brand";
 
 const sections = ["planner", "calendar", "capture", "account"] as const;
 
@@ -36,7 +37,7 @@ export default async function SettingsSectionPage({ params }: { params: Promise<
     const goals = await getGoals(supabase, user.id, p);
     return (
       <div className="space-y-8">
-      <Panel title="Planner" intro="How DayPilot plans your day.">
+      <Panel title="Planner" intro={`How ${brand.productName} plans your day.`}>
         <PlannerSettings
           zones={Intl.supportedValuesOf("timeZone")}
           initial={{
@@ -60,7 +61,7 @@ export default async function SettingsSectionPage({ params }: { params: Promise<
       ? new Intl.DateTimeFormat("en-US", { timeZone: p.timezone, month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(sync.lastSyncAt))
       : null;
     return (
-      <Panel title="Calendar" intro="Apple Calendar owns your fixed events. DayPilot reads them, and never changes them.">
+      <Panel title="Calendar" intro={`Apple Calendar owns your fixed events. ${brand.productName} reads them, and never changes them.`}>
         <CalendarSettings connected={sync.connected} lastSyncLabel={lastSyncLabel} upcomingEvents={sync.upcomingEvents} showTitles={p.show_event_titles} />
       </Panel>
     );
@@ -72,7 +73,7 @@ export default async function SettingsSectionPage({ params }: { params: Promise<
       <Panel title="Capture" intro="Send text to your inbox from an iPhone shortcut or any tool that can make a web request.">
         <div className="space-y-1 rounded-lg bg-muted/50 p-4 text-sm">
           <p className="font-medium">What it does</p>
-          <p className="text-muted-foreground">Capture puts a quick thought into your DayPilot inbox in seconds. Inside the app, press Cmd+K; that always works and needs no setup. This page is only for sending thoughts from outside the app, such as an iPhone shortcut. If you won&apos;t do that, you can ignore it.</p>
+          <p className="text-muted-foreground">Capture puts a quick thought into your {brand.productName} inbox in seconds. Inside the app, press Cmd+K; that always works and needs no setup. This page is only for sending thoughts from outside the app, such as an iPhone shortcut. If you won&apos;t do that, you can ignore it.</p>
         </div>
         <div className="rounded-lg border border-border bg-card px-4">
           <SettingsRow label="Status">

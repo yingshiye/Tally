@@ -23,6 +23,7 @@ import { CaptureOverlay } from "@/components/features/planner/CaptureOverlay";
 import { Tooltip } from "@/components/ui/tooltip";
 import { brand } from "@/lib/brand";
 import { cn } from "@/lib/utils";
+import { TallyMark } from "@/components/brand/TallyMark";
 
 const navigation = [
   { href: "/today", label: brand.modules.today, icon: CalendarCheck },
@@ -100,8 +101,8 @@ export function DashboardShell({
     <>
       <div className="flex h-14 items-center border-b border-sidebar-border px-3">
         <Link href="/today" className="flex min-w-0 flex-1 items-center gap-2.5">
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground">
-            IT
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
+            <TallyMark className="size-[18px]" />
           </span>
           <span
             className={cn(
@@ -109,7 +110,7 @@ export function DashboardShell({
               collapsed && "md:hidden",
             )}
           >
-            Internship Tracker
+            {brand.productName}
           </span>
         </Link>
         <Tooltip label="Close navigation">
@@ -245,7 +246,7 @@ export function DashboardShell({
               <Menu className="size-5" />
             </button>
           </Tooltip>
-          <span className="ml-2 text-sm font-semibold">Internship Tracker</span>
+          <span className="ml-2 text-sm font-semibold">{brand.productName}</span>
         </header>
         <main className="min-h-screen bg-background">{children}</main>
         <CaptureOverlay />

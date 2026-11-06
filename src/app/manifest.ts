@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: brand.productName,
     short_name: brand.productName,
-    description: "Plan your day: top priorities, what's now, and what's next.",
+    description: "Track internship applications, tailor resumes, and plan your day.",
     start_url: "/today",
     scope: "/",
     display: "standalone",
