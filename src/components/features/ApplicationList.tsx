@@ -1,10 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, ArrowUpDown, Inbox, SearchX } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  ChevronRight,
+  Inbox,
+  SearchX,
+} from "lucide-react";
 import type { Tables } from "@/types/supabase";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getNextEvent } from "@/lib/applications/next-event";
+import { normalizeCompany } from "@/lib/applications/duplicates";
 import { ApplicationRow } from "./ApplicationRow";
 
 type Application = Tables<"applications">;
@@ -64,6 +72,8 @@ export function ApplicationList({
   const [search, setSearch] = useState("");
   const [sortColumn, setSortColumn] = useState<SortColumn>("applied_date");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [grouped, setGrouped] = useState(true);
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
   const nextEventByAppId = useMemo(() => {
     const now = new Date();
@@ -129,6 +139,27 @@ export function ApplicationList({
     });
   }, [filtered, sortColumn, sortDirection, nextEventByAppId]);
 
+  // Groups keep the order in which each company first appears in `sorted`.
+  const groups = useMemo(() => {
+    const byKey = new Map<string, Application[]>();
+    for (const app of sorted) {
+      const key = normalizeCompany(app.company) || app.id;
+      const list = byKey.get(key);
+      if (list) list.push(app);
+      else byKey.set(key, [app]);
+    }
+    return [...byKey.entries()].map(([key, apps]) => ({ key, apps }));
+  }, [sorted]);
+
+  function toggleGroup(key: string) {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
   function toggleSort(column: SortColumn) {
     if (sortColumn === column) {
       setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
@@ -166,6 +197,15 @@ export function ApplicationList({
               aria-label="Search applications by company or role"
               className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-[200px]"
             />
+            <label className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={grouped}
+                onChange={(e) => setGrouped(e.target.checked)}
+                className="size-3.5 accent-foreground"
+              />
+              Group by company
+            </label>
             <div
               className="scrollbar-visible flex gap-1 overflow-x-auto pb-1 sm:pb-0"
               role="group"
@@ -270,16 +310,101 @@ export function ApplicationList({
                   </td>
                 </tr>
               ) : (
-                sorted.map((app, index) => (
-                  <ApplicationRow
-                    key={app.id}
-                    index={index}
-                    application={app}
-                    events={events}
-                    nextEvent={nextEventByAppId.get(app.id) ?? null}
-                    userId={userId}
-                  />
-                ))
+                (() => {
+                  const renderRow = (
+                    app: Application,
+                    index: number,
+                    hideCompany = false,
+                  ) => (
+                    <ApplicationRow
+                      key={app.id}
+                      index={index}
+                      application={app}
+                      events={events}
+                      nextEvent={nextEventByAppId.get(app.id) ?? null}
+                      userId={userId}
+                      hideCompany={hideCompany}
+                    />
+                  );
+                  if (!grouped) {
+                    return sorted.map((app, i) => renderRow(app, i));
+                  }
+                  let rowIndex = 0;
+                  return groups.flatMap(({ key, apps }) => {
+                    const isOpen = !collapsed.has(key);
+                    const counts = new Map<Application["status"], number>();
+                    for (const a of apps) {
+                      counts.set(a.status, (counts.get(a.status) ?? 0) + 1);
+                    }
+                    const summary = [...counts.entries()]
+                      .sort((x, y) => STATUS_ORDER[x[0]] - STATUS_ORDER[y[0]])
+                      .map(([status, n]) => `${n} ${status === "oa" ? "OA" : status}`)
+                      .join(" · ");
+                    return [
+                      <tr key={`group-${key}`} className="border-t border-foreground/20 bg-muted first:border-t-0">
+                        {/* Narrow screens only render 3 columns; a colSpan past
+                            the real column count would steal width from the rows. */}
+                        <td colSpan={3} className="p-0 lg:hidden">
+                          <button
+                            type="button"
+                            onClick={() => toggleGroup(key)}
+                            aria-expanded={isOpen}
+                            className="flex w-full items-center gap-2 px-3 py-2.5 text-left hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:gap-2.5 sm:px-4"
+                          >
+                            <ChevronRight
+                              className={`size-4 shrink-0 text-muted-foreground transition-transform duration-150 ${
+                                isOpen ? "rotate-90" : ""
+                              }`}
+                              aria-hidden="true"
+                            />
+                            <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-card text-[11px] font-semibold text-muted-foreground">
+                              {apps[0].company.slice(0, 2).toUpperCase()}
+                            </span>
+                            <span className="truncate text-[15px] font-medium text-foreground">
+                              {apps[0].company}
+                            </span>
+                            <span className="shrink-0 text-xs text-muted-foreground">
+                              {apps.length} {apps.length === 1 ? "role" : "roles"}
+                            </span>
+                            <span className="ml-auto hidden truncate text-xs text-muted-foreground sm:inline">
+                              {summary}
+                            </span>
+                          </button>
+                        </td>
+                        <td colSpan={5} className="hidden p-0 lg:table-cell">
+                          <button
+                            type="button"
+                            onClick={() => toggleGroup(key)}
+                            aria-expanded={isOpen}
+                            className="flex w-full items-center gap-2 px-3 py-2.5 text-left hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:gap-2.5 sm:px-4"
+                          >
+                            <ChevronRight
+                              className={`size-4 shrink-0 text-muted-foreground transition-transform duration-150 ${
+                                isOpen ? "rotate-90" : ""
+                              }`}
+                              aria-hidden="true"
+                            />
+                            <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-card text-[11px] font-semibold text-muted-foreground">
+                              {apps[0].company.slice(0, 2).toUpperCase()}
+                            </span>
+                            <span className="truncate text-[15px] font-medium text-foreground">
+                              {apps[0].company}
+                            </span>
+                            <span className="shrink-0 text-xs text-muted-foreground">
+                              {apps.length} {apps.length === 1 ? "role" : "roles"}
+                            </span>
+                            <span className="ml-auto hidden truncate text-xs text-muted-foreground sm:inline">
+                              {summary}
+                            </span>
+                          </button>
+                        </td>
+                      </tr>,
+                      ...(isOpen
+                        ? apps.map((app) => renderRow(app, rowIndex++, true))
+                        : []),
+                    ];
+                  });
+                })()
               )}
             </tbody>
           </table>

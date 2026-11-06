@@ -42,7 +42,15 @@ export default async function DashboardPage() {
             Track your internship pipeline
           </p>
         </div>
-        <AddApplicationModal userId={user.id} />
+        <AddApplicationModal
+          userId={user.id}
+          existing={apps.map(({ id, company, role, status }) => ({
+            id,
+            company,
+            role,
+            status,
+          }))}
+        />
       </div>
       <StatsBar applications={apps} />
       <WeeklyActivity applications={apps} />

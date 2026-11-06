@@ -28,6 +28,11 @@ import { normalizeUrl } from "@/lib/url";
 import { localDateStamp } from "@/lib/date";
 import { withTimeout } from "@/lib/utils";
 import { useFieldOptions } from "@/lib/hooks/useFieldOptions";
+import {
+  findDuplicates,
+  type DuplicateCandidate,
+  type DuplicateMatch,
+} from "@/lib/applications/duplicates";
 import type { ApplicationStatus } from "@/types/supabase";
 
 const SUPABASE_TIMEOUT_MS = 10_000;
@@ -66,8 +71,15 @@ const SPONSORSHIP_LABEL: Record<ExtractedJob["sponsorship"], string> = {
   not_mentioned: "Sponsorship: not mentioned in posting.",
 };
 
-export function AddApplicationModal({ userId }: { userId: string }) {
+export function AddApplicationModal({
+  userId,
+  existing,
+}: {
+  userId: string;
+  existing: DuplicateCandidate[];
+}) {
   const [open, setOpen] = useState(false);
+  const [duplicates, setDuplicates] = useState<DuplicateMatch[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -126,6 +138,7 @@ export function AddApplicationModal({ userId }: { userId: string }) {
   }
 
   function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen) setDuplicates(null);
     if (nextOpen) {
       setForm((prev) =>
         prev.applied_date
@@ -136,8 +149,18 @@ export function AddApplicationModal({ userId }: { userId: string }) {
     setOpen(nextOpen);
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const matches = findDuplicates(existing, form);
+    if (matches.length > 0) {
+      setDuplicates(matches);
+      return;
+    }
+    void saveApplication();
+  }
+
+  async function saveApplication() {
+    setDuplicates(null);
     setError(null);
     setLoading(true);
 
@@ -202,6 +225,47 @@ export function AddApplicationModal({ userId }: { userId: string }) {
             Add application
           </DialogTitle>
         </DialogHeader>
+        {duplicates ? (
+          <div className="flex flex-col gap-3 pt-2">
+            <p className="text-sm text-foreground">
+              {duplicates.some((m) => m.similarRole)
+                ? "This looks like one you already added."
+                : `You already have ${duplicates.length === 1 ? "another role" : `${duplicates.length} other roles`} at ${duplicates[0].application.company}.`}
+            </p>
+            <ul className="divide-y divide-border rounded-md border border-border text-sm">
+              {duplicates.map(({ application, similarRole }) => (
+                <li
+                  key={application.id}
+                  className={`flex items-center justify-between gap-3 px-3 py-2 ${
+                    similarRole ? "bg-warning-bg text-warning-text" : ""
+                  }`}
+                >
+                  <span className="min-w-0 break-words">
+                    {application.company} — {application.role}
+                    {similarRole && (
+                      <span className="ml-2 text-xs font-medium">likely duplicate</span>
+                    )}
+                  </span>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {application.status}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-muted-foreground">
+              Adding &ldquo;{form.role}&rdquo; at {form.company}.
+            </p>
+            {error && <p className="text-sm text-danger-text">{error}</p>}
+            <div className="flex justify-end gap-2 pt-1">
+              <Button type="button" variant="outline" onClick={() => setDuplicates(null)}>
+                Back to edit
+              </Button>
+              <Button type="button" disabled={loading} onClick={() => void saveApplication()}>
+                {loading ? "Adding…" : "Add anyway"}
+              </Button>
+            </div>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-2">
           <div className="flex flex-col gap-1.5 rounded-md border border-dashed p-3">
             <Label htmlFor="jd_text">Paste job description (optional)</Label>
@@ -329,6 +393,7 @@ export function AddApplicationModal({ userId }: { userId: string }) {
             </Button>
           </div>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );

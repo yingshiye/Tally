@@ -74,8 +74,11 @@ export function ApplicationRow({
   nextEvent,
   userId,
   index = 0,
+  hideCompany = false,
 }: {
   index?: number;
+  /** Inside a company group the header already names the company. */
+  hideCompany?: boolean;
   application: Application;
   events: Event[];
   nextEvent: Event | null;
@@ -123,21 +126,38 @@ export function ApplicationRow({
         style={{ "--row-i": index } as React.CSSProperties}
       >
         {/* Company / Role */}
-        <td className="px-3 py-3 sm:px-4">
+        <td className={
+          hideCompany
+            ? "relative py-3 pl-8 pr-3 before:absolute before:inset-y-0 before:left-5 before:border-l before:border-foreground/20 sm:pl-14 sm:pr-4 sm:before:left-6"
+            : "px-3 py-3 sm:px-4"
+        }>
           <div className="flex min-w-0 items-start gap-3">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-semibold text-muted-foreground">
-              {initials}
-            </div>
+            {!hideCompany && (
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-semibold text-muted-foreground">
+                {initials}
+              </div>
+            )}
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-foreground">
-                {application.company}
-              </p>
-              <p
-                className="mt-0.5 break-words text-xs text-muted-foreground"
-                title={application.role}
-              >
-                {application.role}
-              </p>
+              {hideCompany ? (
+                <p
+                  className="break-words text-sm font-medium text-foreground"
+                  title={application.role}
+                >
+                  {application.role}
+                </p>
+              ) : (
+                <>
+                  <p className="truncate text-sm font-medium text-foreground">
+                    {application.company}
+                  </p>
+                  <p
+                    className="mt-0.5 break-words text-xs text-muted-foreground"
+                    title={application.role}
+                  >
+                    {application.role}
+                  </p>
+                </>
+              )}
               <p className="mt-1 text-xs text-subtle-foreground lg:hidden">
                 {application.applied_date
                   ? formatDate(application.applied_date)
