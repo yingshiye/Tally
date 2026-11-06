@@ -33,6 +33,15 @@ test("isAuthorized: correct secret is accepted", () => {
   assert.equal(isAuthorized("Bearer test-secret", "test-secret"), true);
 });
 
+test("isAuthorized: near-misses are rejected (prefix, longer, wrong scheme, no space, empty secret)", () => {
+  assert.equal(isAuthorized("Bearer test-secre", "test-secret"), false);
+  assert.equal(isAuthorized("Bearer test-secret-extra", "test-secret"), false);
+  assert.equal(isAuthorized("Basic test-secret", "test-secret"), false);
+  assert.equal(isAuthorized("Bearertest-secret", "test-secret"), false);
+  assert.equal(isAuthorized("Bearer ", ""), false);
+  assert.equal(isAuthorized("", ""), false);
+});
+
 test("isAuthorized: unset CRON_SECRET rejects everything, even a literal 'Bearer undefined' header", () => {
   assert.equal(isAuthorized("Bearer undefined", undefined), false);
   assert.equal(isAuthorized(null, undefined), false);

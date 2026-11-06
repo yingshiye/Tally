@@ -28,6 +28,7 @@ npm run lint               # ESLint (the repo-wide run is noisy from .claude/wor
 npx tsc --noEmit           # type check (there is no type-check script)
 npm test                   # unit tests (tsx --test)
 npm run test:e2e           # Playwright
+npm run seed:planner -- --email you@example.com [--reset]   # fictional planner data, local Supabase only
 
 # Supabase
 npx supabase start | stop
@@ -46,6 +47,8 @@ src/
     (auth)/               # login, signup, forgot/reset password — split layout, no nav shell
     (dashboard)/          # protected pages inside DashboardShell (sidebar)
       dashboard/          # applications: stats funnel, weekly chart, table, upcoming
+      today/              # DayPilot planner (landing after login)
+      settings/           # status cards + /settings/[section] (planner, calendar, capture, account)
       prep/               # NeetCode 150 tracker
       watchlist/          # careers-page monitoring
       resumes/            # resume list + /resumes/[resumeId] editor
@@ -53,6 +56,7 @@ src/
     api/
       cron/check-jobs/    # scheduled watchlist check (see vercel.json)
       extract-job/        # JD paste-to-autofill
+      planner/            # today (GET), capture and calendar-sync (POST, token) routes
   components/
     ui/                   # shadcn primitives
     features/             # domain components; resume-editor/ holds the editor
@@ -60,6 +64,7 @@ src/
     supabase/             # client.ts (browser singleton), server.ts (cookies)
     resume/               # editor domain logic, measurement, versions, export (unit-tested)
     prep/                 # NeetCode 150 data
+    planner/              # DayPilot pure logic + server/ (actions, queries)
     format/relative.ts    # relative day helpers (formatUntil / formatAgo)
     applications/         # next-event helper
   types/supabase.ts       # generated — never hand-edit
@@ -79,7 +84,7 @@ e2e/                      # Playwright specs
 
 ### Data model
 
-Tables (see `src/types/supabase.ts` and `supabase/migrations/` for columns): `applications`, `events`, `user_watchlist`, `url_snapshots`, `study_task_progress`, `user_field_options`, `resumes`, `resume_headers`, `resume_sections`, `resume_entries`, `resume_entry_bullets`, `resume_versions`, `resume_library_blocks`, `resume_library_bullets`.
+Tables (see `src/types/supabase.ts` and `supabase/migrations/` for columns): `applications`, `events`, `user_watchlist`, `url_snapshots`, `study_task_progress`, `user_field_options`, `resumes`, `resume_headers`, `resume_sections`, `resume_entries`, `resume_entry_bullets`, `resume_versions`, `resume_library_blocks`, `resume_library_bullets`, and the `planner_*` tables (preferences, projects, tasks, inbox_items, blocks, calendar_events, changes, goal_logs).
 
 Application status is one of `wishlist | applied | oa | interview | offer | rejected`.
 
@@ -91,6 +96,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=   # server-only; never expose to client
 GEMINI_API_KEY=              # /api/extract-job (server-only, Google AI Studio)
 CRON_SECRET=                 # authorizes /api/cron/check-jobs (server-only)
+PLANNER_CAPTURE_TOKEN=       # optional: bearer token for /api/planner/capture (server-only, >= 32 chars)
+PLANNER_CAPTURE_USER_ID=     # optional: the one user that endpoint writes to (server-only)
 ```
 
 `.env.local` for local dev; mirror in Vercel project settings for production.
@@ -104,6 +111,21 @@ CRON_SECRET=                 # authorizes /api/cron/check-jobs (server-only)
 - `updated_at` is maintained by a Postgres trigger (`moddatetime`), not application code.
 - Preserve routes, Supabase behavior, data contracts, and business logic unless a task explicitly changes them.
 - Use design tokens from `src/app/globals.css`, not hardcoded colors.
+
+## DayPilot planner rules
+
+- All planner logic lives in pure TypeScript modules under `src/lib/planner/`. React components only display data and submit actions.
+- Planner modules never read the clock or the database directly. `now` and all data are passed in, so every function is testable.
+- The UI reads one stable JSON shape from `GET /api/planner/today`. Components do not query planner tables directly.
+- Store all times as `timestamptz` (UTC). Compute "today" and day boundaries in the user's timezone from `planner_preferences`, never from the server's timezone.
+- No personal constants in code. Work hours, goal targets, block sizes, and timezone live in `planner_preferences`.
+- All user-facing names live in `src/lib/brand.ts`, so renaming the product or a module touches one file.
+- Planner tables are prefixed `planner_`. Never modify `applications`, `events`, `url_snapshots`, or `user_watchlist`.
+- Server code validates everything (Zod). Never trust the client. Secrets and the service role key never reach the browser.
+- Writes that move, postpone, drop, or complete things are appended to `planner_changes`.
+- `POST /api/planner/capture` is write-only, bearer-token authenticated (constant-time compare, checked before the body is read), size-limited, rate-limited from the database, and writes one inbox row for one fixed user. Keep it that way; see `docs/daypilot/capture-endpoint.md`.
+- `POST /api/planner/calendar-sync` authenticates with a per-user token stored only as a SHA-256 hash (`planner_integrations`), replaces only that user's `apple`-source events inside the window it is sent, and returns counts only. Keep it that way; see `docs/daypilot/calendar-sync.md`.
+- No LLM calls in phase 1. Build specs: `docs/prompts/daypilot-phase1.md`, `docs/daypilot/engine-spec.md`.
 
 ## Working agreements
 

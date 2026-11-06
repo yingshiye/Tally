@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  if (!user && pathname.startsWith("/dashboard")) {
+  if (!user && (pathname.startsWith("/dashboard") || pathname.startsWith("/today"))) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -40,7 +40,7 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.searchParams.get("reset") === "success";
 
   if (user && (pathname === "/signup" || pathname === "/login") && !isPostResetLogin) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/today", request.url));
   }
 
   return supabaseResponse;

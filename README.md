@@ -12,6 +12,7 @@ A full-stack workspace for running an internship search: track every application
 - **Versioned exports** — run preflight checks, save snapshots, compare or restore versions, attach the submitted version to an application, and export to PDF.
 - **Career-page watchlist** — monitor job pages and surface content changes through a protected scheduled job.
 - **Interview preparation** — follow a three-week SWE recruiting sprint with linked NeetCode and LeetCode work, mock OAs, deliberate review, and persisted progress.
+- **DayPilot planner** — a Today screen with three priorities, a now/next card, a draggable day timeline, daily goals, Cmd+K capture to an inbox, and an optional token-protected capture endpoint. See `docs/daypilot/`.
 - **Private user data** — Supabase Auth and PostgreSQL row-level security isolate each user's records.
 
 ## Stack
@@ -90,6 +91,7 @@ npx supabase db reset
 | `npm run lint` | Run ESLint |
 | `npm test` | Run the unit and integration-style TypeScript tests |
 | `npm run test:e2e` | Run the Chromium end-to-end suite |
+| `npm run seed:planner -- --email you@example.com [--reset]` | Fictional planner data; local Supabase only |
 
 The Playwright suite requires a running local Supabase stack and deliberately refuses to run against a hosted Supabase URL. It provisions a temporary user and removes it during teardown when the local service-role key is available.
 
@@ -102,12 +104,17 @@ Database-level RLS and RPC checks live in `supabase/tests/`. Each test file docu
 | `/` | Product landing page |
 | `/login`, `/signup` | Email/password authentication |
 | `/forgot-password`, `/reset-password` | Password recovery |
+| `/today` | DayPilot: top 3, now/next, day timeline, goals, inbox |
+| `/settings/[section]` | Settings: planner, calendar, capture, account |
 | `/dashboard` | Application pipeline, statistics, and upcoming events |
 | `/watchlist` | Career-page change monitor |
 | `/prep` | 21-day SWE interview preparation roadmap |
 | `/resumes` | Resume list |
 | `/resumes/[resumeId]` | Resume editor, checks, versions, and export |
 | `/resume-blocks` | Reusable resume-entry and bullet library |
+| `GET /api/planner/today` | Planner JSON for one day (signed-in users) |
+| `POST /api/planner/calendar-sync` | Token-protected Apple Calendar import; see `docs/daypilot/calendar-sync.md` |
+| `POST /api/planner/capture` | Bearer-token write-only inbox capture; see `docs/daypilot/capture-endpoint.md` |
 
 ## Project structure
 
@@ -117,6 +124,7 @@ src/
   components/features/ Product components and resume editor
   components/ui/       Shared UI primitives
   lib/resume/          Resume domain logic and tests
+  lib/planner/         DayPilot pure logic (time, free slots, parsing, rules) and server actions
   lib/supabase/        Browser, server, and service-role clients
   types/               Supabase database types
 supabase/

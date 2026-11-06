@@ -9,19 +9,24 @@ import {
   Eye,
   FileText,
   Layers,
+  CalendarCheck,
   LayoutDashboard,
   Menu,
   Moon,
   PanelLeftOpen,
+  Settings,
   Sun,
   X,
 } from "lucide-react";
 import { LogoutButton } from "@/components/features/LogoutButton";
+import { CaptureOverlay } from "@/components/features/planner/CaptureOverlay";
 import { Tooltip } from "@/components/ui/tooltip";
+import { brand } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/today", label: brand.modules.today, icon: CalendarCheck },
+  { href: "/dashboard", label: brand.modules.applications, icon: LayoutDashboard },
   { href: "/prep", label: "OA Prep", icon: BookOpenCheck },
   { href: "/watchlist", label: "Watchlist", icon: Eye },
   { href: "/resumes", label: "Resumes", icon: FileText },
@@ -81,7 +86,7 @@ export function DashboardShell({
   const sidebar = (
     <>
       <div className="flex h-14 items-center border-b border-sidebar-border px-3">
-        <Link href="/dashboard" className="flex min-w-0 flex-1 items-center gap-2.5">
+        <Link href="/today" className="flex min-w-0 flex-1 items-center gap-2.5">
           <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground">
             IT
           </span>
@@ -143,6 +148,24 @@ export function DashboardShell({
       </nav>
 
       <div className="space-y-1 border-t border-sidebar-border p-2">
+        <Tooltip label={brand.modules.settings}>
+          <Link
+            href="/settings"
+            onClick={() => setMobileOpen(false)}
+            aria-current={pathname.startsWith("/settings") ? "page" : undefined}
+            aria-label={brand.modules.settings}
+            className={cn(
+              "flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors",
+              pathname.startsWith("/settings")
+                ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              collapsed && "md:justify-center md:px-0"
+            )}
+          >
+            <Settings className="size-4 shrink-0" />
+            <span className={cn("truncate", collapsed && "md:hidden")}>{brand.modules.settings}</span>
+          </Link>
+        </Tooltip>
         <Tooltip label={dark ? "Use light theme" : "Use dark theme"}>
           <button
             type="button"
@@ -212,6 +235,7 @@ export function DashboardShell({
           <span className="ml-2 text-sm font-semibold">Internship Tracker</span>
         </header>
         <main className="min-h-screen bg-background">{children}</main>
+        <CaptureOverlay />
       </div>
     </div>
   );

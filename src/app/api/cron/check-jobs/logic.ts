@@ -1,3 +1,4 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../../../types/supabase";
 import { normalizeUrl } from "../../../../lib/url";
@@ -11,7 +12,10 @@ export function isAuthorized(
   authHeader: string | null,
   cronSecret: string | undefined
 ): boolean {
-  return !!cronSecret && authHeader === `Bearer ${cronSecret}`;
+  if (!cronSecret || authHeader === null) return false;
+  // Hash both sides so the comparison runs over equal-length buffers in constant time.
+  const digest = (v: string) => createHash("sha256").update(v).digest();
+  return timingSafeEqual(digest(authHeader), digest(`Bearer ${cronSecret}`));
 }
 
 async function hashContent(text: string): Promise<string> {
