@@ -89,7 +89,7 @@ Application status is one of `wishlist | applied | oa | interview | offer | reje
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=   # server-only; never expose to client
-ANTHROPIC_API_KEY=           # /api/extract-job (server-only)
+GEMINI_API_KEY=              # /api/extract-job (server-only, Google AI Studio)
 CRON_SECRET=                 # authorizes /api/cron/check-jobs (server-only)
 ```
 

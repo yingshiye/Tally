@@ -1,29 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 const MAX_JD_CHARS = 20_000;
+const GEMINI_MODEL = "gemini-3.1-flash-lite";
 
-const EXTRACT_TOOL: Anthropic.Tool = {
-  name: "extracted_job",
-  description: "Structured fields extracted from a job posting description.",
-  input_schema: {
-    type: "object",
-    properties: {
-      company: { type: "string", description: "Company name, or empty string if not stated." },
-      role: { type: "string", description: "Job title/role, or empty string if not stated." },
-      location: { type: "string", description: "Location (city/state, or 'Remote'), or empty string if not stated." },
-      deadline: { type: "string", description: "Application deadline as YYYY-MM-DD if explicitly stated, else empty string." },
-      sponsorship: {
-        type: "string",
-        enum: ["sponsors", "no_sponsorship", "not_mentioned"],
-        description: "Whether the posting mentions visa sponsorship / work authorization requirements.",
-      },
-      sponsorship_quote: { type: "string", description: "Short verbatim quote backing the sponsorship field, or empty string if not_mentioned." },
+const EXTRACTED_JOB_SCHEMA = {
+  type: "object",
+  properties: {
+    company: { type: "string", description: "Company name, or empty string if not stated." },
+    role: { type: "string", description: "Job title/role, or empty string if not stated." },
+    location: { type: "string", description: "Location (city/state, or 'Remote'), or empty string if not stated." },
+    deadline: { type: "string", description: "Application deadline as YYYY-MM-DD if explicitly stated, else empty string." },
+    sponsorship: {
+      type: "string",
+      enum: ["sponsors", "no_sponsorship", "not_mentioned"],
+      description: "Whether the posting mentions visa sponsorship / work authorization requirements.",
     },
-    required: ["company", "role", "location", "deadline", "sponsorship", "sponsorship_quote"],
+    sponsorship_quote: { type: "string", description: "Short verbatim quote backing the sponsorship field, or empty string if not_mentioned." },
   },
+  required: ["company", "role", "location", "deadline", "sponsorship", "sponsorship_quote"],
 };
+
+interface ExtractedJob {
+  company: string;
+  role: string;
+  location: string;
+  deadline: string;
+  sponsorship: "sponsors" | "no_sponsorship" | "not_mentioned";
+  sponsorship_quote: string;
+}
 
 export async function POST(request: NextRequest) {
   const supabase = await getSupabaseServerClient();
@@ -32,10 +37,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY is not configured on the server" },
+      { error: "GEMINI_API_KEY is not configured on the server" },
       { status: 500 }
     );
   }
@@ -54,22 +59,31 @@ export async function POST(request: NextRequest) {
 
   const trimmedJd = jdText.trim().slice(0, MAX_JD_CHARS);
 
-  const client = new Anthropic({ apiKey });
-
-  let message: Anthropic.Message;
+  let response: Response;
   try {
-    message = await client.messages.create({
-      model: "claude-haiku-5-5",
-      max_tokens: 500,
-      tools: [EXTRACT_TOOL],
-      tool_choice: { type: "tool", name: "extracted_job" },
-      messages: [
-        {
-          role: "user",
-          content: `Extract structured fields from this job posting. Leave a field as an empty string if the posting doesn't state it — never guess.\n\n${trimmedJd}`,
-        },
-      ],
-    });
+    response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: `Extract structured fields from this job posting. Leave a field as an empty string if the posting doesn't state it — never guess.\n\n${trimmedJd}`,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: EXTRACTED_JOB_SCHEMA,
+          },
+        }),
+      }
+    );
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Extraction request failed" },
@@ -77,12 +91,26 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const toolUse = message.content.find(
-    (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
-  );
-  if (!toolUse) {
+  if (!response.ok) {
+    const errText = await response.text().catch(() => "");
+    return NextResponse.json(
+      { error: `Gemini request failed (${response.status}): ${errText}` },
+      { status: 502 }
+    );
+  }
+
+  const data = await response.json();
+  const textPart: string | undefined = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!textPart) {
     return NextResponse.json({ error: "Model did not return structured data" }, { status: 502 });
   }
 
-  return NextResponse.json({ extracted: toolUse.input });
+  let extracted: ExtractedJob;
+  try {
+    extracted = JSON.parse(textPart);
+  } catch {
+    return NextResponse.json({ error: "Model returned malformed JSON" }, { status: 502 });
+  }
+
+  return NextResponse.json({ extracted });
 }
