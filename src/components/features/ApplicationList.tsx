@@ -13,6 +13,7 @@ import type { Tables } from "@/types/supabase";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getNextEvent } from "@/lib/applications/next-event";
 import { normalizeCompany } from "@/lib/applications/duplicates";
+import { weekKeyOfDateString } from "@/lib/applications/weeks";
 import { ApplicationRow } from "./ApplicationRow";
 
 type Application = Tables<"applications">;
@@ -63,10 +64,15 @@ export function ApplicationList({
   applications,
   events,
   userId,
+  weekFilter = null,
+  onClearWeek,
 }: {
   applications: Application[];
   events: Event[];
   userId: string;
+  /** Monday key (YYYY-MM-DD); only applications applied that week are shown. */
+  weekFilter?: string | null;
+  onClearWeek?: () => void;
 }) {
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [search, setSearch] = useState("");
@@ -88,6 +94,9 @@ export function ApplicationList({
     const term = search.trim().toLowerCase();
     return applications.filter((a) => {
       if (filter !== "all" && a.status !== filter) return false;
+      if (weekFilter && weekKeyOfDateString(a.applied_date) !== weekFilter) {
+        return false;
+      }
       if (
         term &&
         !a.company.toLowerCase().includes(term) &&
@@ -97,7 +106,7 @@ export function ApplicationList({
       }
       return true;
     });
-  }, [applications, filter, search]);
+  }, [applications, filter, search, weekFilter]);
 
   const sorted = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
@@ -188,7 +197,7 @@ export function ApplicationList({
               {sorted.length === 1 ? "application" : "applications"}
             </p>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
             <input
               type="search"
               value={search}
@@ -292,7 +301,7 @@ export function ApplicationList({
                       <p className="mt-1 text-sm text-muted-foreground">
                         {applications.length === 0
                           ? 'Use "Add application" at the top of the page to log your first one.'
-                          : "Try a different search or status filter."}
+                          : "Try a different search, status, or week."}
                       </p>
                       {applications.length > 0 && (
                         <button
@@ -300,6 +309,7 @@ export function ApplicationList({
                           onClick={() => {
                             setFilter("all");
                             setSearch("");
+                            onClearWeek?.();
                           }}
                           className="mt-3 rounded-md border border-input px-3 py-1.5 text-xs font-medium text-foreground transition-[background-color,transform] duration-150 hover:bg-muted active:scale-95"
                         >

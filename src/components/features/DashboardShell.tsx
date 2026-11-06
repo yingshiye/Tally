@@ -33,6 +33,19 @@ const navigation = [
   { href: "/resume-blocks", label: "Resume blocks", icon: Layers },
 ];
 
+/** Sidebar labels are visible when expanded, so a tooltip only helps when collapsed to icons. */
+function NavTip({
+  enabled,
+  label,
+  children,
+}: {
+  enabled: boolean;
+  label: string;
+  children: React.ReactElement;
+}) {
+  return enabled ? <Tooltip label={label}>{children}</Tooltip> : children;
+}
+
 export function DashboardShell({
   children,
   changedCount,
@@ -116,7 +129,7 @@ export function DashboardShell({
           const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(`${item.href}/`));
           const Icon = item.icon;
           return (
-            <Tooltip key={item.href} label={item.label}>
+            <NavTip key={item.href} enabled={collapsed} label={item.label}>
               <Link
               href={item.href}
               onClick={() => setMobileOpen(false)}
@@ -142,13 +155,13 @@ export function DashboardShell({
                   />
                 )}
               </Link>
-            </Tooltip>
+            </NavTip>
           );
         })}
       </nav>
 
       <div className="space-y-1 border-t border-sidebar-border p-2">
-        <Tooltip label={brand.modules.settings}>
+        <NavTip enabled={collapsed} label={brand.modules.settings}>
           <Link
             href="/settings"
             onClick={() => setMobileOpen(false)}
@@ -165,8 +178,8 @@ export function DashboardShell({
             <Settings className="size-4 shrink-0" />
             <span className={cn("truncate", collapsed && "md:hidden")}>{brand.modules.settings}</span>
           </Link>
-        </Tooltip>
-        <Tooltip label={dark ? "Use light theme" : "Use dark theme"}>
+        </NavTip>
+        <NavTip enabled={collapsed} label={dark ? "Use light theme" : "Use dark theme"}>
           <button
             type="button"
             onClick={toggleTheme}
@@ -181,9 +194,9 @@ export function DashboardShell({
               {dark ? "Light mode" : "Dark mode"}
             </span>
           </button>
-        </Tooltip>
+        </NavTip>
         <LogoutButton collapsed={collapsed} />
-        <Tooltip label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
+        <NavTip enabled={collapsed} label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
           <button
             type="button"
             onClick={toggleCollapsed}
@@ -196,7 +209,7 @@ export function DashboardShell({
             {collapsed ? <PanelLeftOpen className="size-4" /> : <ChevronLeft className="size-4" />}
             {!collapsed && <span>Collapse</span>}
           </button>
-        </Tooltip>
+        </NavTip>
       </div>
     </>
   );
@@ -213,14 +226,14 @@ export function DashboardShell({
       )}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform duration-[250ms] ease-[var(--ease-out)] md:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-52 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform duration-[250ms] ease-[var(--ease-out)] md:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           collapsed && "md:w-[68px]"
         )}
       >
         {sidebar}
       </aside>
-      <div className={cn("min-w-0 transition-[padding] duration-200 md:pl-60", collapsed && "md:pl-[68px]")}>
+      <div className={cn("min-w-0 transition-[padding] duration-200 md:pl-52", collapsed && "md:pl-[68px]")}>
         <header className="sticky top-0 z-30 flex h-14 items-center border-b border-border bg-background px-4 md:hidden">
           <Tooltip label="Open navigation">
             <button

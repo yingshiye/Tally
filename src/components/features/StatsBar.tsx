@@ -51,7 +51,7 @@ export function StatsBar({ applications }: { applications: Application[] }) {
               ),
           )}
         </div>
-        <dl className="mt-3 grid grid-cols-4 gap-2">
+        <dl className="mt-3 flex flex-wrap justify-between gap-x-4 gap-y-2">
           {counts.map((stage) => (
             <div key={stage.status}>
               <dd
@@ -63,9 +63,9 @@ export function StatsBar({ applications }: { applications: Application[] }) {
               >
                 {stage.count}
               </dd>
-              <dt className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <dt className="mt-0.5 flex items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground">
                 <span
-                  className={`size-2 rounded-full ${stage.fill}`}
+                  className={`size-2 shrink-0 rounded-full ${stage.fill}`}
                   aria-hidden="true"
                 />
                 {stage.label}
