@@ -115,7 +115,9 @@ export function DatePicker({ id, value, onChange, disabled, className, placehold
   };
   const firstWeekday = new Date(view.year, view.month, 1).getDay();
   const dayCount = new Date(view.year, view.month + 1, 0).getDate();
-  const cells = [...Array<null>(firstWeekday).fill(null), ...Array.from({ length: dayCount }, (_, index) => index + 1)];
+  // Always render 6 weeks so the panel height never changes between months.
+  const cells: (number | null)[] = [...Array<null>(firstWeekday).fill(null), ...Array.from({ length: dayCount }, (_, index) => index + 1)];
+  while (cells.length < 42) cells.push(null);
   const isCurrentMonth = view.year === today.getFullYear() && view.month === today.getMonth();
 
   return (
@@ -139,7 +141,7 @@ export function DatePicker({ id, value, onChange, disabled, className, placehold
         </div>
         <div className="grid grid-cols-7 text-center text-[11px] text-muted-foreground">
           {WEEKDAYS.map((weekday) => <span key={weekday} className="pb-1.5">{weekday}</span>)}
-          {cells.map((day, index) => day === null ? <span key={`empty-${index}`} /> : (
+          {cells.map((day, index) => day === null ? <span key={`empty-${index}`} className="size-8" /> : (
             <button
               key={day}
               type="button"
