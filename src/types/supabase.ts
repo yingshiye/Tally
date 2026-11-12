@@ -699,6 +699,7 @@ export type Database = {
           end_date: string | null;
           education_data: EducationData | null;
           skills_data: SkillsData | null;
+          type_label: string | null;
           sort_order: number;
           created_at: string;
           updated_at: string;
@@ -717,6 +718,7 @@ export type Database = {
           end_date?: string | null;
           education_data?: EducationData | null;
           skills_data?: SkillsData | null;
+          type_label?: string | null;
           sort_order?: number;
           created_at?: string;
           updated_at?: string;
@@ -735,6 +737,7 @@ export type Database = {
           end_date?: string | null;
           education_data?: EducationData | null;
           skills_data?: SkillsData | null;
+          type_label?: string | null;
           sort_order?: number;
           created_at?: string;
           updated_at?: string;

@@ -10,31 +10,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { LayoutKind } from "@/lib/resume/types";
+import { Combobox } from "@/components/ui/combobox";
+import {
+  DEFAULT_TYPE_LABELS,
+  buildTypeOptions,
+  findPreset,
+  isAutoSectionTitle,
+  normalizeTypeLabel,
+  sectionTitleFor,
+} from "@/lib/resume/block-types";
+import type { LayoutKind, LibraryBlock } from "@/lib/resume/types";
 import { LibraryBlockTypeFields, type LibraryBlockDetails } from "./LibraryBlockTypeFields";
 
 const LAYOUT_KIND_OPTIONS: { value: LayoutKind; label: string }[] = [
-  { value: "entry", label: "Entry (experience, project, leadership…)" },
+  { value: "entry", label: "Entry (title, organization, dates, bullets)" },
   { value: "education", label: "Education" },
   { value: "skills", label: "Skills" },
 ];
-
-const DEFAULT_SECTION_TITLES: Record<LayoutKind, string> = {
-  entry: "Experience",
-  education: "Education",
-  skills: "Skills",
-};
 
 export type LibraryBlockFormValues = LibraryBlockDetails & {
   name: string;
   defaultSectionTitle: string;
   layoutKind: LayoutKind;
+  typeLabel: string;
 };
 
 export const EMPTY_LIBRARY_BLOCK_FORM: LibraryBlockFormValues = {
   name: "",
   defaultSectionTitle: "Experience",
   layoutKind: "entry",
+  typeLabel: DEFAULT_TYPE_LABELS.entry,
   title: "",
   organization: "",
   location: "",
@@ -58,6 +63,7 @@ export function LibraryBlockForm({
   values,
   onChange,
   lockLayoutKind,
+  existingBlocks = [],
   onCancel,
   onSubmit,
   loading,
@@ -69,6 +75,8 @@ export function LibraryBlockForm({
   values: LibraryBlockFormValues;
   onChange: (values: LibraryBlockFormValues) => void;
   lockLayoutKind?: boolean;
+  /** The user's current library, used to suggest their own types first. */
+  existingBlocks?: Pick<LibraryBlock, "type_label" | "layout_kind">[];
   onCancel: () => void;
   onSubmit: () => void;
   loading: boolean;
@@ -81,15 +89,33 @@ export function LibraryBlockForm({
   }
 
   function setLayoutKind(layoutKind: LayoutKind) {
+    // Keep a custom type; swap a default or preset type that belongs to the old layout.
+    const typeLabel =
+      !normalizeTypeLabel(values.typeLabel) || findPreset(values.typeLabel, values.layoutKind)
+        ? DEFAULT_TYPE_LABELS[layoutKind]
+        : values.typeLabel;
     onChange({
       ...values,
       layoutKind,
-      defaultSectionTitle:
-        !values.defaultSectionTitle || Object.values(DEFAULT_SECTION_TITLES).includes(values.defaultSectionTitle)
-          ? DEFAULT_SECTION_TITLES[layoutKind]
-          : values.defaultSectionTitle,
+      typeLabel,
+      defaultSectionTitle: isAutoSectionTitle(values.defaultSectionTitle)
+        ? sectionTitleFor(layoutKind, typeLabel)
+        : values.defaultSectionTitle,
     });
   }
+
+  function setTypeLabel(typeLabel: string) {
+    onChange({
+      ...values,
+      typeLabel,
+      defaultSectionTitle: isAutoSectionTitle(values.defaultSectionTitle)
+        ? sectionTitleFor(values.layoutKind, typeLabel)
+        : values.defaultSectionTitle,
+    });
+  }
+
+  const typeOptions = buildTypeOptions({ layoutKind: values.layoutKind, query: "", blocks: existingBlocks });
+  const typeChoices = [...typeOptions.yours.map((type) => type.label), ...typeOptions.presets.map((preset) => preset.label)];
 
   return (
     <form
@@ -110,7 +136,7 @@ export function LibraryBlockForm({
         />
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor={`${idPrefix}-layout-kind`}>Type</Label>
+        <Label htmlFor={`${idPrefix}-layout-kind`}>Layout</Label>
         <Select value={values.layoutKind} onValueChange={(v) => setLayoutKind(v as LayoutKind)} disabled={lockLayoutKind}>
           <SelectTrigger id={`${idPrefix}-layout-kind`} className="w-full">
             <SelectValue />
@@ -125,6 +151,20 @@ export function LibraryBlockForm({
         </Select>
       </div>
       <div className="flex flex-col gap-1.5">
+        <Label htmlFor={`${idPrefix}-type-label`}>Type</Label>
+        <Combobox
+          id={`${idPrefix}-type-label`}
+          value={values.typeLabel}
+          onChange={setTypeLabel}
+          options={typeChoices}
+          showAllWhenExactMatch
+          placeholder="Work experience, Project, Clinical rotation…"
+        />
+        <p className="text-xs text-muted-foreground">
+          Pick one of yours or type a new name. It groups this block in your library.
+        </p>
+      </div>
+      <div className="flex flex-col gap-1.5">
         <Label htmlFor={`${idPrefix}-default-section`}>Default section title</Label>
         <Input
           id={`${idPrefix}-default-section`}
@@ -137,6 +177,7 @@ export function LibraryBlockForm({
       <LibraryBlockTypeFields
         idPrefix={idPrefix}
         layoutKind={values.layoutKind}
+        typeLabel={values.typeLabel}
         details={values}
         setDetail={(field, value) => onChange({ ...values, [field]: value })}
       />

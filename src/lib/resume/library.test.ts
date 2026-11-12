@@ -88,3 +88,37 @@ test("reorderLibraryBullets: renumbers sort_order to match the given order, scop
     { id: "b2", sortOrder: 3, blockId: "block-1" },
   ]);
 });
+
+test("createLibraryBlock: stores a normalized type_label, or null when blank", async () => {
+  const inserted: Record<string, unknown>[] = [];
+  const supabase = {
+    from() {
+      return {
+        insert(row: Record<string, unknown>) {
+          inserted.push(row);
+          return { select: () => ({ single: () => Promise.resolve({ data: { id: "b1", ...row }, error: null }) }) };
+        },
+      };
+    },
+  } as unknown as SupabaseClient<Database>;
+
+  const base = { name: "Rotation", defaultSectionTitle: "Clinical experience", layoutKind: "entry" as const };
+  await createLibraryBlock(supabase, "user-1", { ...base, typeLabel: "  Clinical   rotation " });
+  await createLibraryBlock(supabase, "user-1", { ...base, typeLabel: "   " });
+
+  assert.equal(inserted[0].type_label, "Clinical rotation");
+  assert.equal(inserted[1].type_label, null);
+});
+
+test("createLibraryBlock: rejects a type_label over 40 characters", async () => {
+  const supabase = {} as unknown as SupabaseClient<Database>;
+  await assert.rejects(
+    createLibraryBlock(supabase, "user-1", {
+      name: "x",
+      defaultSectionTitle: "Experience",
+      layoutKind: "entry",
+      typeLabel: "a".repeat(41),
+    }),
+    ValidationError,
+  );
+});

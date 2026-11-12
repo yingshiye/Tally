@@ -14,9 +14,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { createLibraryBlock, libraryBlockFormToInput } from "@/lib/resume/library";
+import type { LibraryBlock } from "@/lib/resume/types";
 import { EMPTY_LIBRARY_BLOCK_FORM, LibraryBlockForm } from "./LibraryBlockForm";
 
-export function AddResumeBlockModal({ userId }: { userId: string }) {
+export function AddResumeBlockModal({
+  userId,
+  existingBlocks,
+}: {
+  userId: string;
+  existingBlocks?: LibraryBlock[];
+}) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +63,7 @@ export function AddResumeBlockModal({ userId }: { userId: string }) {
           idPrefix="block"
           values={form}
           onChange={setForm}
+          existingBlocks={existingBlocks}
           onCancel={() => setOpen(false)}
           onSubmit={handleSubmit}
           loading={loading}

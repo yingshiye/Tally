@@ -18,6 +18,8 @@ type ComboboxProps = {
   placeholder?: string;
   className?: string;
   required?: boolean;
+  /** When the text exactly matches an option, keep listing every option so the value is easy to change. */
+  showAllWhenExactMatch?: boolean;
 };
 
 export function Combobox({
@@ -31,6 +33,7 @@ export function Combobox({
   placeholder,
   className,
   required,
+  showAllWhenExactMatch = false,
 }: ComboboxProps) {
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(0);
@@ -46,8 +49,9 @@ export function Combobox({
   const filtered = useMemo(() => {
     const query = value.trim().toLowerCase();
     if (!query) return options;
+    if (showAllWhenExactMatch && options.some((option) => option.toLowerCase() === query)) return options;
     return options.filter((option) => option.toLowerCase().includes(query));
-  }, [options, value]);
+  }, [options, value, showAllWhenExactMatch]);
 
   const showAddRow =
     value.trim().length > 0 &&

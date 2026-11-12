@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { createLibraryBlock, libraryBlockFormToInput } from "@/lib/resume/library";
+import { DEFAULT_TYPE_LABELS } from "@/lib/resume/block-types";
 import { EMPTY_LIBRARY_BLOCK_FORM, LibraryBlockForm, type LibraryBlockFormValues } from "../LibraryBlockForm";
 import { EditResumeBlockModal } from "../EditResumeBlockModal";
 import { useEditor } from "./useEditorController";
@@ -24,6 +25,7 @@ export function CopyBlockMenu({ section, onClose }: { section: ResumeSection; on
   const [createForm, setCreateForm] = useState<LibraryBlockFormValues>({
     ...EMPTY_LIBRARY_BLOCK_FORM,
     layoutKind: section.layout_kind,
+    typeLabel: DEFAULT_TYPE_LABELS[section.layout_kind],
     defaultSectionTitle: section.title,
   });
   const [creating, setCreating] = useState(false);
@@ -87,6 +89,7 @@ export function CopyBlockMenu({ section, onClose }: { section: ResumeSection; on
             values={createForm}
             onChange={setCreateForm}
             lockLayoutKind
+            existingBlocks={library.blocks}
             onCancel={() => setView({ kind: "browse" })}
             onSubmit={() => void handleCreate()}
             loading={creating}
@@ -130,7 +133,7 @@ export function CopyBlockMenu({ section, onClose }: { section: ResumeSection; on
                   size="sm"
                   className="mt-1 w-fit gap-1.5"
                   onClick={() => {
-                    setCreateForm({ ...EMPTY_LIBRARY_BLOCK_FORM, layoutKind: section.layout_kind, defaultSectionTitle: section.title });
+                    setCreateForm({ ...EMPTY_LIBRARY_BLOCK_FORM, layoutKind: section.layout_kind, typeLabel: DEFAULT_TYPE_LABELS[section.layout_kind], defaultSectionTitle: section.title });
                     setView({ kind: "create" });
                   }}
                 >

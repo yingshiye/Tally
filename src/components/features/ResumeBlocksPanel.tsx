@@ -39,10 +39,12 @@ import type {
   LayoutKind,
   LibraryBlock,
   LibraryBullet,
+  SkillsData,
 } from "@/lib/resume/types";
 import type { Resume, ResumeSection } from "@/lib/resume/types";
 import { createSection } from "@/lib/resume/sections";
 import { copyBlockIntoSection } from "@/lib/resume/entries";
+import { blockTypeLabel, countTypes } from "@/lib/resume/block-types";
 import { AddResumeBlockModal } from "./AddResumeBlockModal";
 import { EditResumeBlockModal } from "./EditResumeBlockModal";
 
@@ -64,13 +66,6 @@ const KIND_TONES: Record<LayoutKind, string> = {
   skills: "bg-success-bg text-success-text",
 };
 
-const FILTER_OPTIONS: { value: LayoutKind | "all"; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "entry", label: "Entry" },
-  { value: "education", label: "Education" },
-  { value: "skills", label: "Skills" },
-];
-
 const MAX_DOTS = 6;
 
 export function ResumeBlocksPanel({
@@ -86,7 +81,7 @@ export function ResumeBlocksPanel({
   sections: ResumeSection[];
   userId: string;
 }) {
-  const [layoutFilter, setLayoutFilter] = useState<LayoutKind | "all">("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
 
   const bulletsByBlock = useMemo(() => {
@@ -99,30 +94,29 @@ export function ResumeBlocksPanel({
     return map;
   }, [bullets]);
 
-  const countsByKind = useMemo(() => {
-    const counts: Record<LayoutKind | "all", number> = {
-      all: blocks.length,
-      entry: 0,
-      education: 0,
-      skills: 0,
-    };
-    for (const block of blocks) counts[block.layout_kind] += 1;
-    return counts;
-  }, [blocks]);
+  const typeCounts = useMemo(() => countTypes(blocks), [blocks]);
+
+  // A filter pointing at a type that no longer exists (after re-categorizing
+  // its last block) falls back to "all" instead of showing an empty list.
+  const activeFilter =
+    typeFilter === "all" || typeCounts.some((type) => type.label.toLowerCase() === typeFilter)
+      ? typeFilter
+      : "all";
 
   const filteredBlocks = useMemo(() => {
     const term = search.trim().toLowerCase();
     return blocks.filter((block) => {
-      if (layoutFilter !== "all" && block.layout_kind !== layoutFilter)
-        return false;
+      const typeLabel = blockTypeLabel(block);
+      if (activeFilter !== "all" && typeLabel.toLowerCase() !== activeFilter) return false;
       if (!term) return true;
       return (
         block.name.toLowerCase().includes(term) ||
+        typeLabel.toLowerCase().includes(term) ||
         (block.title ?? "").toLowerCase().includes(term) ||
         (block.organization ?? "").toLowerCase().includes(term)
       );
     });
-  }, [blocks, layoutFilter, search]);
+  }, [blocks, activeFilter, search]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -133,15 +127,14 @@ export function ResumeBlocksPanel({
             aria-label="Filter blocks by type"
             className="flex flex-wrap gap-1.5"
           >
-            {FILTER_OPTIONS.map((opt) => {
-              const active = layoutFilter === opt.value;
-              const Icon = opt.value === "all" ? null : KIND_ICONS[opt.value];
+            {[{ label: "All", key: "all", count: blocks.length }, ...typeCounts.map((type) => ({ label: type.label, key: type.label.toLowerCase(), count: type.count }))].map((opt) => {
+              const active = activeFilter === opt.key;
               return (
                 <button
-                  key={opt.value}
+                  key={opt.key}
                   type="button"
                   aria-pressed={active}
-                  onClick={() => setLayoutFilter(opt.value)}
+                  onClick={() => setTypeFilter(opt.key)}
                   className={cn(
                     "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     active
@@ -149,7 +142,6 @@ export function ResumeBlocksPanel({
                       : "border-input text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
-                  {Icon && <Icon className="size-3.5" aria-hidden="true" />}
                   {opt.label}
                   <span
                     className={cn(
@@ -157,7 +149,7 @@ export function ResumeBlocksPanel({
                       active ? "opacity-70" : "text-subtle-foreground",
                     )}
                   >
-                    {countsByKind[opt.value]}
+                    {opt.count}
                   </span>
                 </button>
               );
@@ -170,7 +162,7 @@ export function ResumeBlocksPanel({
             className="w-56"
           />
         </div>
-        <AddResumeBlockModal userId={userId} />
+        <AddResumeBlockModal userId={userId} existingBlocks={blocks} />
       </div>
 
       {filteredBlocks.length === 0 ? (
@@ -187,6 +179,7 @@ export function ResumeBlocksPanel({
             <LibraryBlockCard
               key={block.id}
               block={block}
+              allBlocks={blocks}
               bullets={bulletsByBlock.get(block.id) ?? []}
               resumes={resumes}
               sections={sections}
@@ -200,11 +193,13 @@ export function ResumeBlocksPanel({
 
 function LibraryBlockCard({
   block,
+  allBlocks,
   bullets,
   resumes,
   sections,
 }: {
   block: LibraryBlock;
+  allBlocks: LibraryBlock[];
   bullets: LibraryBullet[];
   resumes: Resume[];
   sections: ResumeSection[];
@@ -234,12 +229,20 @@ function LibraryBlockCard({
 
   const subtitleParts = [block.title, block.organization].filter(Boolean);
   const KindIcon = KIND_ICONS[block.layout_kind];
+  const isSkills = block.layout_kind === "skills";
+  const skillCategories = (
+    (block.skills_data as SkillsData | null)?.categories ?? []
+  ).filter((category) => category.label || category.items.length > 0);
+  const skillCount = skillCategories.reduce(
+    (total, category) => total + category.items.length,
+    0,
+  );
 
   return (
     <>
       <Card className="gap-3 px-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <div className="flex min-w-0 flex-1 basis-48 items-center gap-3">
             <span
               title={LAYOUT_KIND_LABELS[block.layout_kind]}
               className={cn(
@@ -257,6 +260,9 @@ function LibraryBlockCard({
                 <p className="truncate text-sm font-medium text-foreground">
                   {block.name}
                 </p>
+                <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                  {blockTypeLabel(block)}
+                </span>
               </div>
               {subtitleParts.length > 0 && (
                 <p className="truncate text-xs text-muted-foreground">
@@ -265,7 +271,7 @@ function LibraryBlockCard({
               )}
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-1">
+          <div className="ml-auto flex shrink-0 items-center gap-1">
             <button
               type="button"
               onClick={() => setAddOpen(true)}
@@ -277,29 +283,58 @@ function LibraryBlockCard({
             <button
               type="button"
               onClick={() => setExpanded((v) => !v)}
-              title={expanded ? "Hide bullets" : "Show bullets"}
+              title={
+                isSkills
+                  ? expanded
+                    ? "Hide skills"
+                    : "Show skills"
+                  : expanded
+                    ? "Hide bullets"
+                    : "Show bullets"
+              }
               className="flex items-center gap-1 rounded px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
             >
-              <span
-                className="flex w-[46px] items-center justify-end gap-0.5"
-                aria-hidden="true"
-              >
-                {Array.from(
-                  { length: Math.min(bullets.length, MAX_DOTS) },
-                  (_, dot) => (
-                    <span
-                      key={dot}
-                      className="size-1.5 rounded-full bg-subtle-foreground"
-                    />
-                  ),
-                )}
-              </span>
-              <span className="w-4 text-right tabular-nums">
-                {bullets.length}
-              </span>
-              <span className="sr-only">
-                {bullets.length === 1 ? "bullet" : "bullets"}
-              </span>
+              {isSkills ? (
+                <>
+                  <span
+                    className="w-[46px] text-right text-subtle-foreground"
+                    aria-hidden="true"
+                  >
+                    {skillCount === 1 ? "skill" : "skills"}
+                  </span>
+                  <span className="w-4 text-right tabular-nums">
+                    {skillCount}
+                  </span>
+                  <span className="sr-only">
+                    {skillCount === 1 ? "skill" : "skills"} in{" "}
+                    {skillCategories.length}{" "}
+                    {skillCategories.length === 1 ? "category" : "categories"}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span
+                    className="flex w-[46px] items-center justify-end gap-0.5"
+                    aria-hidden="true"
+                  >
+                    {Array.from(
+                      { length: Math.min(bullets.length, MAX_DOTS) },
+                      (_, dot) => (
+                        <span
+                          key={dot}
+                          className="size-1.5 rounded-full bg-subtle-foreground"
+                        />
+                      ),
+                    )}
+                  </span>
+                  <span className="w-4 text-right tabular-nums">
+                    {bullets.length}
+                  </span>
+                  <span className="sr-only">
+                    {bullets.length === 1 ? "bullet" : "bullets"}
+                  </span>
+                </>
+              )}
               {expanded ? (
                 <ChevronUp className="h-3.5 w-3.5" />
               ) : (
@@ -329,11 +364,33 @@ function LibraryBlockCard({
           </div>
         </div>
 
-        {expanded && <BulletsEditor blockId={block.id} bullets={bullets} />}
+        {expanded &&
+          (isSkills ? (
+            <div className="flex flex-col gap-1.5 border-t border-border pt-3">
+              {skillCategories.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  No skills yet. Use Edit to add categories.
+                </p>
+              ) : (
+                skillCategories.map((category, index) => (
+                  <p key={index} className="text-sm text-foreground">
+                    <span className="font-medium">{category.label}</span>
+                    {category.label && category.items.length > 0 ? ": " : ""}
+                    <span className="text-muted-foreground">
+                      {category.items.join(", ")}
+                    </span>
+                  </p>
+                ))
+              )}
+            </div>
+          ) : (
+            <BulletsEditor blockId={block.id} bullets={bullets} />
+          ))}
       </Card>
 
       <EditResumeBlockModal
         block={block}
+        existingBlocks={allBlocks}
         open={editOpen}
         onOpenChange={setEditOpen}
       />

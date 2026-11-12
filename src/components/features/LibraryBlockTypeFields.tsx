@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Tooltip } from "@/components/ui/tooltip";
+import { entryFieldLabels } from "@/lib/resume/block-types";
 import type { LayoutKind } from "@/lib/resume/types";
 
 export type SkillCategoryForm = {
@@ -29,11 +30,14 @@ export type LibraryBlockDetails = {
 type Props = {
   idPrefix: string;
   layoutKind: LayoutKind;
+  /** Entry layout only: a known type renames the title/organization fields. */
+  typeLabel?: string;
   details: LibraryBlockDetails;
   setDetail: <K extends keyof LibraryBlockDetails>(field: K, value: LibraryBlockDetails[K]) => void;
 };
 
-export function LibraryBlockTypeFields({ idPrefix, layoutKind, details, setDetail }: Props) {
+export function LibraryBlockTypeFields({ idPrefix, layoutKind, typeLabel, details, setDetail }: Props) {
+  const entryLabels = entryFieldLabels(typeLabel);
   if (layoutKind === "skills") {
     const updateCategory = (categoryIndex: number, patch: Partial<SkillCategoryForm>) => {
       setDetail(
@@ -140,15 +144,15 @@ export function LibraryBlockTypeFields({ idPrefix, layoutKind, details, setDetai
         <>
           <TextField
             id={`${idPrefix}-title`}
-            label="Job title / Role"
-            placeholder="Software Engineer Intern"
+            label={entryLabels.title}
+            placeholder={entryLabels.titlePlaceholder}
             value={details.title}
             onChange={(value) => setDetail("title", value)}
           />
           <TextField
             id={`${idPrefix}-organization`}
-            label="Organization"
-            placeholder="Google"
+            label={entryLabels.organization}
+            placeholder={entryLabels.organizationPlaceholder}
             value={details.organization}
             onChange={(value) => setDetail("organization", value)}
           />

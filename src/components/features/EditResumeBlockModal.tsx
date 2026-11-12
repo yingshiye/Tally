@@ -12,14 +12,17 @@ import {
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { libraryBlockFormToInput, updateLibraryBlock } from "@/lib/resume/library";
 import type { EducationData, LibraryBlock, SkillsData } from "@/lib/resume/types";
+import { blockTypeLabel } from "@/lib/resume/block-types";
 import { LibraryBlockForm } from "./LibraryBlockForm";
 
 export function EditResumeBlockModal({
   block,
+  existingBlocks,
   open,
   onOpenChange,
 }: {
   block: LibraryBlock;
+  existingBlocks?: LibraryBlock[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -29,6 +32,7 @@ export function EditResumeBlockModal({
     name: block.name,
     defaultSectionTitle: block.default_section_title,
     layoutKind: block.layout_kind,
+    typeLabel: blockTypeLabel(block),
     title: block.title ?? "",
     organization: block.organization ?? "",
     location: block.location ?? "",
@@ -90,6 +94,7 @@ export function EditResumeBlockModal({
           idPrefix="edit-block"
           values={form}
           onChange={setForm}
+          existingBlocks={existingBlocks}
           onCancel={() => onOpenChange(false)}
           onSubmit={handleSubmit}
           loading={loading}

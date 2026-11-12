@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, TablesUpdate } from "@/types/supabase";
+import { TYPE_LABEL_MAX, normalizeTypeLabel } from "./block-types";
 import { LAYOUT_KINDS, type LayoutKind, type LibraryBlock, type LibraryBullet } from "./types";
 import { ValidationError, assertPlainText, normalizePlainText, validateEducationData, validateSkillsData } from "./validate";
 
@@ -16,10 +17,21 @@ function normalizeOptionalText(value: string | null | undefined, fieldName: stri
   return trimmed;
 }
 
+function normalizeTypeLabelInput(value: string | null | undefined): string | null {
+  const label = normalizeTypeLabel(value);
+  if (label === null) return null;
+  if (label.length > TYPE_LABEL_MAX) {
+    throw new ValidationError(`type_label must be at most ${TYPE_LABEL_MAX} characters`);
+  }
+  assertPlainText(label, "type_label");
+  return label;
+}
+
 export type LibraryBlockInput = {
   name: string;
   defaultSectionTitle: string;
   layoutKind: LayoutKind;
+  typeLabel?: string | null;
   title?: string | null;
   subtitle?: string | null;
   organization?: string | null;
@@ -40,6 +52,7 @@ export function libraryBlockFormToInput(form: {
   name: string;
   defaultSectionTitle: string;
   layoutKind: LayoutKind;
+  typeLabel?: string;
   title: string;
   organization: string;
   location: string;
@@ -56,6 +69,7 @@ export function libraryBlockFormToInput(form: {
     name: form.name,
     defaultSectionTitle: form.defaultSectionTitle,
     layoutKind: form.layoutKind,
+    typeLabel: form.typeLabel ?? null,
     title: form.layoutKind === "skills" ? null : form.title || null,
     subtitle: null,
     organization: form.layoutKind === "entry" ? form.organization || null : null,
@@ -106,6 +120,7 @@ export async function createLibraryBlock(
   input: LibraryBlockInput,
 ): Promise<LibraryBlock> {
   if (!LAYOUT_KINDS.includes(input.layoutKind)) throw new ValidationError("Invalid layout_kind");
+  const typeLabel = normalizeTypeLabelInput(input.typeLabel);
 
   const { data, error } = await supabase
     .from("resume_library_blocks")
@@ -114,6 +129,7 @@ export async function createLibraryBlock(
       name: normalizePlainText(input.name, "name"),
       default_section_title: normalizePlainText(input.defaultSectionTitle, "default_section_title"),
       layout_kind: input.layoutKind,
+      type_label: typeLabel,
       title: normalizeOptionalText(input.title, "title"),
       subtitle: normalizeOptionalText(input.subtitle, "subtitle"),
       organization: normalizeOptionalText(input.organization, "organization"),
@@ -144,6 +160,7 @@ export async function updateLibraryBlock(
     if (!LAYOUT_KINDS.includes(input.layoutKind)) throw new ValidationError("Invalid layout_kind");
     patch.layout_kind = input.layoutKind;
   }
+  if (input.typeLabel !== undefined) patch.type_label = normalizeTypeLabelInput(input.typeLabel);
   if (input.title !== undefined) patch.title = normalizeOptionalText(input.title, "title");
   if (input.subtitle !== undefined) patch.subtitle = normalizeOptionalText(input.subtitle, "subtitle");
   if (input.organization !== undefined) patch.organization = normalizeOptionalText(input.organization, "organization");
