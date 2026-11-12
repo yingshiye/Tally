@@ -27,7 +27,17 @@ export default async function SettingsLayout({ children }: { children: React.Rea
 
   return (
     <div className="mx-auto w-full max-w-[960px] space-y-5 p-4 sm:p-6 lg:p-8">
-      <h1 className="text-xl font-semibold sm:text-2xl">{brand.modules.settings}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+        <h1 className="text-xl font-semibold sm:text-2xl">{brand.modules.settings}</h1>
+        {user.email && (
+          <div className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground" title={`Signed in as ${user.email}`}>
+            <span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-medium text-foreground">
+              {user.email.slice(0, 2).toUpperCase()}
+            </span>
+            <span className="truncate">{user.email}</span>
+          </div>
+        )}
+      </div>
       <SettingsCards status={status} />
       {children}
     </div>
