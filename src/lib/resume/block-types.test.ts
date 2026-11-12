@@ -84,3 +84,17 @@ test("buildTypeOptions does not offer to create a label that already exists", ()
   assert.equal(buildTypeOptions({ layoutKind: "entry", query: "project", blocks }).create, null);
   assert.equal(buildTypeOptions({ layoutKind: "entry", query: "Leadership team", blocks }).create, "Leadership team");
 });
+
+test("buildTypeOptions leaves hidden presets out but keeps types the user already uses", () => {
+  const options = buildTypeOptions({
+    layoutKind: "entry",
+    query: "",
+    blocks,
+    hidden: ["project", "Work experience"],
+  });
+  assert.ok(!options.presets.some((preset) => preset.label === "Project"));
+  assert.deepEqual(
+    options.yours.map((type) => type.label),
+    ["Work experience", "Gallery residency"],
+  );
+});

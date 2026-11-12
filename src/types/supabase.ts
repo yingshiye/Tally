@@ -262,7 +262,7 @@ export type Database = {
         Row: {
           id: string;
           user_id: string;
-          field: "role" | "location";
+          field: "role" | "location" | "block_type";
           value: string;
           hidden: boolean;
           created_at: string;
@@ -270,7 +270,7 @@ export type Database = {
         Insert: {
           id?: string;
           user_id: string;
-          field: "role" | "location";
+          field: "role" | "location" | "block_type";
           value: string;
           hidden?: boolean;
           created_at?: string;
@@ -278,7 +278,7 @@ export type Database = {
         Update: {
           id?: string;
           user_id?: string;
-          field?: "role" | "location";
+          field?: "role" | "location" | "block_type";
           value?: string;
           hidden?: boolean;
           created_at?: string;

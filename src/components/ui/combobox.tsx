@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Popover } from "radix-ui";
-import { XIcon } from "lucide-react";
+import { EyeOffIcon, Undo2Icon, XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,11 @@ type ComboboxProps = {
   removableOptions?: string[];
   onRemoveOption?: (value: string) => void | Promise<void>;
   onSaveOption?: (value: string) => void | Promise<void>;
+  /** Tooltip and aria text for the × on removable options. */
+  removeLabel?: string;
+  /** Options the user removed; listed in a collapsible footer so they can be brought back. */
+  hiddenOptions?: string[];
+  onRestoreOption?: (value: string) => void | Promise<void>;
   placeholder?: string;
   className?: string;
   required?: boolean;
@@ -30,6 +35,9 @@ export function Combobox({
   removableOptions = [],
   onRemoveOption,
   onSaveOption,
+  removeLabel = "Remove saved suggestion",
+  hiddenOptions = [],
+  onRestoreOption,
   placeholder,
   className,
   required,
@@ -37,6 +45,7 @@ export function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(0);
+  const [showHidden, setShowHidden] = useState(false);
   const [portalContainer, setPortalContainer] = useState<HTMLElement>();
   const inputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -58,6 +67,7 @@ export function Combobox({
     !options.some((option) => option.toLowerCase() === value.trim().toLowerCase());
 
   const rowCount = filtered.length + (showAddRow ? 1 : 0);
+  const canRestore = Boolean(onRestoreOption) && hiddenOptions.length > 0;
 
   useEffect(() => {
     if (open) itemRefs.current[highlighted]?.scrollIntoView({ block: "nearest" });
@@ -151,7 +161,7 @@ export function Combobox({
           onKeyDown={handleKeyDown}
         />
       </Popover.Anchor>
-      {rowCount > 0 && (
+      {(rowCount > 0 || canRestore) && (
         <Popover.Portal container={portalContainer}>
           <Popover.Content
             align="start"
@@ -191,9 +201,9 @@ export function Combobox({
                       <button
                         type="button"
                         tabIndex={-1}
-                        aria-label={`Remove ${option} from saved suggestions`}
+                        aria-label={`${removeLabel}: ${option}`}
                         aria-keyshortcuts="Delete"
-                        title="Remove saved suggestion"
+                        title={removeLabel}
                         onMouseDown={(event) => {
                           event.preventDefault();
                           event.stopPropagation();
@@ -236,6 +246,43 @@ export function Combobox({
                   {onSaveOption ? "Save" : "Add"} &ldquo;{value.trim()}&rdquo;
                   {onSaveOption && " as a suggestion"}
                 </button>
+              )}
+              {canRestore && (
+                <div className="mt-1 border-t border-border pt-1">
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    aria-expanded={showHidden}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => setShowHidden((prev) => !prev)}
+                    className="flex w-full cursor-default items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <EyeOffIcon className="size-3.5" />
+                    Hidden ({hiddenOptions.length})
+                  </button>
+                  {showHidden &&
+                    hiddenOptions.map((option) => (
+                      <div key={option} className="flex items-center rounded-md px-2 py-1 text-sm text-muted-foreground">
+                        <span className="min-w-0 flex-1 truncate">{option}</span>
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          aria-label={`Restore ${option}`}
+                          title="Show in suggestions again"
+                          onMouseDown={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                          }}
+                          onClick={() => {
+                            void Promise.resolve(onRestoreOption?.(option)).catch(() => undefined);
+                          }}
+                          className="flex size-7 shrink-0 items-center justify-center rounded-sm hover:bg-background/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          <Undo2Icon className="size-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                </div>
               )}
             </div>
           </Popover.Content>

@@ -198,10 +198,13 @@ export function buildTypeOptions({
   layoutKind,
   query,
   blocks,
+  hidden = [],
 }: {
   layoutKind: LayoutKind;
   query: string;
   blocks: { type_label: string | null; layout_kind: LayoutKind }[];
+  /** Preset labels the user hid from suggestions. Types already on a block still show under `yours`. */
+  hidden?: string[];
 }): TypeOptions {
   const normalizedQuery = normalizeTypeLabel(query);
   const needle = (normalizedQuery ?? "").toLocaleLowerCase();
@@ -214,6 +217,7 @@ export function buildTypeOptions({
     (preset) =>
       preset.layoutKind === layoutKind &&
       matches(preset.label) &&
+      !hidden.some((label) => sameLabel(label, preset.label)) &&
       !allYours.some((type) => sameLabel(type.label, preset.label)),
   );
   const exists =

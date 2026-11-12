@@ -11,7 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Combobox } from "@/components/ui/combobox";
+import { useHiddenBlockTypes } from "@/lib/hooks/useHiddenBlockTypes";
 import {
+  BLOCK_TYPE_PRESETS,
   DEFAULT_TYPE_LABELS,
   buildTypeOptions,
   findPreset,
@@ -114,7 +116,14 @@ export function LibraryBlockForm({
     });
   }
 
-  const typeOptions = buildTypeOptions({ layoutKind: values.layoutKind, query: "", blocks: existingBlocks });
+  const { hidden, hideType, restoreType } = useHiddenBlockTypes();
+  const typeOptions = buildTypeOptions({ layoutKind: values.layoutKind, query: "", blocks: existingBlocks, hidden });
+  const hiddenPresets = BLOCK_TYPE_PRESETS.filter(
+    (preset) =>
+      preset.layoutKind === values.layoutKind &&
+      hidden.some((label) => label.toLowerCase() === preset.label.toLowerCase()) &&
+      !typeOptions.yours.some((type) => type.label.toLowerCase() === preset.label.toLowerCase()),
+  ).map((preset) => preset.label);
   const typeChoices = [...typeOptions.yours.map((type) => type.label), ...typeOptions.presets.map((preset) => preset.label)];
 
   return (
@@ -157,6 +166,11 @@ export function LibraryBlockForm({
           value={values.typeLabel}
           onChange={setTypeLabel}
           options={typeChoices}
+          removableOptions={typeOptions.presets.map((preset) => preset.label)}
+          onRemoveOption={hideType}
+          removeLabel="Hide from suggestions"
+          hiddenOptions={hiddenPresets}
+          onRestoreOption={restoreType}
           showAllWhenExactMatch
           placeholder="Work experience, Project, Clinical rotation…"
         />
